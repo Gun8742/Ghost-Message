@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:ghost_message/screens/homeScreen.dart';
+import 'package:ghost_message/providers/navigation_provider.dart';
+import 'package:ghost_message/screens/main_wrapper.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => NavigationProvider()),
+      ],
+      child: const MyApp()
+      )
+    );
 }
 
 class MyApp extends StatelessWidget {
@@ -15,7 +24,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: HomeScreen()
+      home: MainWrapper()
     );
   }
 }
