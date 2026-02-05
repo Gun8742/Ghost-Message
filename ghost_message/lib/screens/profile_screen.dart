@@ -12,7 +12,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Profile"),
+        title: Text("Profile",
+        style: TextStyle(
+          fontWeight: FontWeight.bold
+        )
+        ),
       ),
       body: ListView(
         padding: EdgeInsets.all(12),
@@ -83,7 +87,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 IconButton(
                   icon: Icon(Icons.edit_square),
                   onPressed: () {
-                    
+
                   },
                 )
               ]
@@ -133,7 +137,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               SizedBox(height: 5,),
               _buildAchievement(),
             ],
-          )
+          ),
+          SizedBox(height: 100,)
         ],
       )
     );
