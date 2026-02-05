@@ -4,13 +4,19 @@ import 'package:ghost_message/providers/navigation_provider.dart';
 Widget BuildNavbar(BuildContext context, NavigationProvider navigationProvider) {
   return ClipRRect(
     borderRadius: BorderRadius.circular(15),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        _navItem(context, 0, Icons.person_outline, "Profile", navigationProvider),
-        _navItemHome(context, 1, navigationProvider),
-        _navItem(context, 2, Icons.settings_outlined, "Settings", navigationProvider),
-      ],
+    child: Container(
+      decoration: BoxDecoration(
+        color: Colors.white
+      ),
+      child:
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          _navItem(context, 0, Icons.person_outline, "Profile", navigationProvider),
+          _navItemHome(context, 1, navigationProvider),
+          _navItem(context, 2, Icons.settings_outlined, "Settings", navigationProvider),
+        ],
+      )
     )
   );
 }
