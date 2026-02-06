@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ghost_message/models/achievement_model.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -8,6 +9,28 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  int _selectIndex = 0;
+  final List<AchievementModel> achievement1 = [
+    AchievementModel(title: "First", progress: 0.2),
+    AchievementModel(title: "Second", progress: 0.5),
+    AchievementModel(title: "Third", progress: 0.8),
+    AchievementModel(title: "Fourth", progress: 0.3),
+    ];
+  final List<AchievementModel> achievement2 = [
+    AchievementModel(title: "Fifth", progress: 0.9),
+    AchievementModel(title: "Sixth", progress: 0.8),
+    AchievementModel(title: "Seventh", progress: 0.8),
+    AchievementModel(title: "Eighth", progress: 0.8),
+  ];
+  final List<AchievementModel> achievement3 = [
+    AchievementModel(title: "Ninth", progress: 0.9),
+    AchievementModel(title: "Ten", progress: 0.8),
+  ];
+  late final List<List<AchievementModel>> separatedAchievement = [
+    achievement1,
+    achievement2,
+    achievement3
+  ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,10 +53,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   height: 200,
                   padding: EdgeInsets.all(4), 
                   decoration: BoxDecoration(
-                    color: Colors.white, // พื้นหลังของช่องว่างให้เป็นสีขาว (หรือสีเดียวกับพื้นหลังแอป)
+                    color: Colors.white,
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: Colors.grey.shade300, // แนะนำสีเทาอ่อน หรือ สีหลักของแอป (Theme Color)
+                      color: Colors.grey.shade300,
                       width: 3.0, 
                     ),
                     boxShadow: [
@@ -127,15 +150,49 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           SizedBox(height: 30,),
-          Column(
+          IndexedStack(
+            index: _selectIndex,
+            children: separatedAchievement.map((items){
+              return _achievementColumnBuild(items);
+            }).toList()
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _buildAchievement(),
-              SizedBox(height: 5,),
-              _buildAchievement(),
-              SizedBox(height: 5,),
-              _buildAchievement(),
-              SizedBox(height: 5,),
-              _buildAchievement(),
+              IconButton(
+                icon: Icon(
+                Icons.arrow_back_ios,
+                color: _selectIndex > 0 ? Colors.black : Colors.grey,
+                ),
+                onPressed: () {
+                  setState(() {
+                    if (_selectIndex > 0) {
+                      _selectIndex--;
+                    }
+                  });
+                },
+              ),
+              Text(
+                "${_selectIndex + 1}",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16
+                ),
+              ),
+              SizedBox(width: 7),
+              IconButton(
+                icon: Icon(
+                  Icons.arrow_forward_ios,
+                  color: _selectIndex < separatedAchievement.length - 1 ? Colors.black : Colors.grey,
+                  ),
+                onPressed: () {
+                  setState(() {
+                    if (_selectIndex < separatedAchievement.length - 1) {
+                      _selectIndex++;
+                    }
+                  });
+                },
+              ),
             ],
           ),
           SizedBox(height: 100,)
@@ -145,7 +202,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 }
 
-Widget _buildAchievement() {
+Widget _buildAchievement(AchievementModel item) {
   return Card(
     color: Colors.grey.shade300,
     elevation: 4,
@@ -154,17 +211,20 @@ Widget _buildAchievement() {
       leading: CircleAvatar(
         radius: 30,
         backgroundColor: Colors.grey.shade700,
+        child: Text(item.title[0], style: TextStyle(color: Colors.white)), 
       ),
-      title: Text("Achievement"),
+      title: Text(item.title),
       subtitle: Slider(
-          value: 0.2,
-          onChanged: (val) {},
-          activeColor: Colors.blue,
-          thumbColor: Colors.blue,
-          inactiveColor: Colors.grey.shade400,
-        ),
+        value: item.progress * 100,
+        onChanged: null,
+        activeColor: Colors.blue,
+        thumbColor: Colors.blue,
+        inactiveColor: Colors.grey.shade400,
+        min: 0,
+        max: 100,
+      ),
       horizontalTitleGap: 10,
-    )
+    ),
   );
 }
 
@@ -174,10 +234,10 @@ Widget _buildBadge() {
     height: 150,
     padding: EdgeInsets.all(4), 
     decoration: BoxDecoration(
-      color: Colors.white, // พื้นหลังของช่องว่างให้เป็นสีขาว (หรือสีเดียวกับพื้นหลังแอป)
+      color: Colors.white,
       shape: BoxShape.circle,
       border: Border.all(
-        color: Colors.grey.shade300, // แนะนำสีเทาอ่อน หรือ สีหลักของแอป (Theme Color)
+        color: Colors.grey.shade300,
         width: 3.0, 
       ),
       boxShadow: [
@@ -194,5 +254,18 @@ Widget _buildBadge() {
         fit: BoxFit.cover,
       ),
     ),
+  );
+}
+
+Widget _achievementColumnBuild(List<AchievementModel> items) {
+  return Column(
+    children: items.map((item){
+      return Column(
+        children: [
+          _buildAchievement(item),
+          SizedBox(height: 5),
+        ],
+      );
+    }).toList()
   );
 }

@@ -6,7 +6,7 @@ Widget BuildNavbar(BuildContext context, NavigationProvider navigationProvider) 
     borderRadius: BorderRadius.circular(15),
     child: Container(
       decoration: BoxDecoration(
-        color: Colors.white
+        color: const Color.fromARGB(255, 255, 255, 255)
       ),
       child:
       Row(
