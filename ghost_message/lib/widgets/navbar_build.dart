@@ -1,25 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:ghost_message/providers/navigation_provider.dart';
+import 'package:ghost_message/providers/l_provider.dart';
+import 'package:provider/provider.dart';
+
 
 Widget BuildNavbar(BuildContext context, NavigationProvider navigationProvider) {
+  final l = Provider.of<L>(context);
   return ClipRRect(
     borderRadius: BorderRadius.circular(15),
     child: Container(
       decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 255, 255, 255)
+        color: Colors.white
       ),
-      child:
-      Row(
+      child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _navItem(context, 0, Icons.person_outline, "Profile", navigationProvider),
+          _navItem(context, 0, Icons.person_outline, l.navProfile, navigationProvider),
           _navItemHome(context, 1, navigationProvider),
-          _navItem(context, 2, Icons.settings_outlined, "Settings", navigationProvider),
+          _navItem(context, 2, Icons.settings_outlined, l.navSetting, navigationProvider),
         ],
       )
     )
   );
 }
+
 
 Widget _navItem(BuildContext context, int index, IconData icon, String label, NavigationProvider navigationProvider) {
   bool isSelected = navigationProvider.currentIndex == index;
