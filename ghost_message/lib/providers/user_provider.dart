@@ -1,0 +1,39 @@
+import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:ghost_message/models/user_model.dart';
+import 'package:ghost_message/services/user_firestore_service.dart';
+
+class UserProvider extends ChangeNotifier {
+  List<UserModel> _allUsers = [];
+  StreamSubscription? _userSubscription;
+  final UserFirestoreService _userFirestoreService = UserFirestoreService();
+
+  List<UserModel> get allUser {
+    return _allUsers;
+  }
+
+  UserModel? get currentUser {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null || _allUsers.isEmpty) return null;
+    try {
+      return _allUsers.firstWhere((user) => user.uid == uid);
+    }
+    catch(e) {
+      return null;
+    }
+  }
+  
+  void initUser() {
+    _userSubscription = _userFirestoreService.getUsers().listen((user) {
+    _allUsers = user;
+    notifyListeners();
+    });
+  }
+
+  @override
+  void dispose() {
+    _userSubscription?.cancel();
+    super.dispose();
+  }
+}

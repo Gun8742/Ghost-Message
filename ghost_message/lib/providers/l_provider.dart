@@ -41,4 +41,12 @@ class L {
   String get newEmailHint => lang == AppLang.th ? "อีเมลใหม่" : "new email";
   String get newPassHint => lang == AppLang.th ? "รหัสผ่านใหม่" : "new password";
   String get confirmPassHint => lang == AppLang.th ? "ยืนยันรหัสผ่าน" : "confirm password";
+
+  String get signOutButton => lang == AppLang.th ? "ออกจากระบบ" : "Sign Out";
+  String get confirmtoSignOutTitle => lang == AppLang.th ? "ยืนยันที่จะออกจากระบบหรือไม่" : "Are you sure want to SIGN OUT?";
+
+  //Profile Page
+  String get profileTitle => lang == AppLang.th ? "โปรไฟล์" : "Profile";
+  String get badgeTitle => lang == AppLang.th ? "เหรียญตรา" : "Badge";
+  String get achievementTitle => lang == AppLang.th ? "ความสำเร็จ" : "Achievement";
 }

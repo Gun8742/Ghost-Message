@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:ghost_message/providers/navigation_provider.dart';
+import 'package:ghost_message/providers/theme_provider.dart';
+import 'package:ghost_message/providers/user_provider.dart';
+import 'package:ghost_message/services/user_firestore_service.dart';
 import 'package:provider/provider.dart';
 import 'package:ghost_message/providers/l_provider.dart';
 import 'package:ghost_message/providers/language_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SettingScreen extends StatefulWidget {
   const SettingScreen({super.key});
@@ -16,14 +21,25 @@ class _SettingScreenState extends State<SettingScreen> {
   bool _location = true;
 
   int _chatDistanceIndex = 0;
-  String _email = "xxxxxxxx@gmail.com";
   
-  int _themeIndex = 0;
+  final UserFirestoreService _userFirestoreService = UserFirestoreService();
+
 
   @override
   Widget build(BuildContext context) {
+    final navigationProvider = Provider.of<NavigationProvider>(context);
     final l = Provider.of<L>(context);
     final langProvider = Provider.of<LanguageProvider>(context);
+    final user = Provider.of<UserProvider>(context);
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final currentUser = user.currentUser;
+
+    if (currentUser == null) {
+    return const Scaffold(
+      body: Center(child: CircularProgressIndicator()),
+    );
+  }
+    String email = user.currentUser!.email;
 
     return Scaffold(
       appBar: AppBar(
@@ -131,7 +147,7 @@ class _SettingScreenState extends State<SettingScreen> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    InkWell(
+                    GestureDetector(
                       onTap: () {
                         setState(() {
                           _chatDistanceIndex = 0;
@@ -152,7 +168,7 @@ class _SettingScreenState extends State<SettingScreen> {
                         ),
                       ),
                     ),
-                    InkWell(
+                    GestureDetector(
                       onTap: () {
                         setState(() {
                           _chatDistanceIndex = 1;
@@ -195,16 +211,16 @@ class _SettingScreenState extends State<SettingScreen> {
               ),
               Expanded(
                 child: Text(
-                  _email,
+                  email,
                   style: TextStyle(color: Colors.grey),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              InkWell(
+              GestureDetector(
                 onTap: () {
-                  showEditEmailDialog(context, l, _email, (newVal) {
+                  showEditEmailDialog(context, l, email, (newVal) {
                     setState(() {
-                      _email = newVal;
+                      email = newVal;
                     });
                   });
                 },
@@ -233,7 +249,7 @@ class _SettingScreenState extends State<SettingScreen> {
                   style: TextStyle(color: Colors.grey),
                 ),
               ),
-              InkWell(
+              GestureDetector(
                 onTap: () {
                   showEditPasswordDialog(context, l);
                 },
@@ -270,16 +286,15 @@ class _SettingScreenState extends State<SettingScreen> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    InkWell(
+                    GestureDetector(
                       onTap: () {
-                        setState(() {
-                          _themeIndex = 0;
-                        });
+                        themeProvider.updateTheme(false);
+                        _userFirestoreService.updateTheme(currentUser.uid, false);
                       },
                       child: Container(
                         padding: EdgeInsets.symmetric(horizontal: 18, vertical: 8),
                         decoration: BoxDecoration(
-                          color: _themeIndex == 0 ? Colors.white : Colors.transparent,
+                          color: !themeProvider.isDarkMode ? Colors.white : Colors.transparent,
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Text(
@@ -288,16 +303,15 @@ class _SettingScreenState extends State<SettingScreen> {
                         ),
                       ),
                     ),
-                    InkWell(
+                    GestureDetector(
                       onTap: () {
-                        setState(() {
-                          _themeIndex = 1;
-                        });
+                        themeProvider.updateTheme(true);
+                        _userFirestoreService.updateTheme(currentUser.uid, true);
                       },
                       child: Container(
                         padding: EdgeInsets.symmetric(horizontal: 18, vertical: 8),
                         decoration: BoxDecoration(
-                          color: _themeIndex == 1 ? Colors.white : Colors.transparent,
+                          color: themeProvider.isDarkMode ? Colors.white : Colors.transparent,
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Text(
@@ -328,9 +342,10 @@ class _SettingScreenState extends State<SettingScreen> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    InkWell(
+                    GestureDetector(
                       onTap: () {
-                        langProvider.setLangIndex(0);
+                        langProvider.setLanguage("th");
+                        _userFirestoreService.updateLanguage(currentUser.uid, "th");
                       },
                       child: Container(
                         padding: EdgeInsets.symmetric(horizontal: 18, vertical: 8),
@@ -344,9 +359,10 @@ class _SettingScreenState extends State<SettingScreen> {
                         ),
                       ),
                     ),
-                    InkWell(
+                    GestureDetector(
                       onTap: () {
-                        langProvider.setLangIndex(1);
+                        langProvider.setLanguage("eng");
+                        _userFirestoreService.updateLanguage(currentUser.uid, "eng");
                       },
                       child: Container(
                         padding: EdgeInsets.symmetric(horizontal: 18, vertical: 8),
@@ -365,7 +381,69 @@ class _SettingScreenState extends State<SettingScreen> {
               )
             ],
           ),
-
+          SizedBox(height: 20),
+          SizedBox(
+            width: double.infinity,
+            height: 55,
+            child: ElevatedButton(
+              onPressed: () async {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Text(
+                      l.confirmtoSignOutTitle,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      )
+                      ),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          l.cancel,
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          )
+                          )
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          navigationProvider.setIndex(1);
+                          await FirebaseAuth.instance.signOut();
+                          if (context.mounted) {
+                            Navigator.pushNamedAndRemoveUntil(context, "/sign-in", (route) => false );
+                          }
+                        },
+                        child: Text(
+                          l.signOutButton,
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          )
+                        )
+                      )
+                    ],
+                  )
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red.shade50,
+                elevation: 0,
+                side: BorderSide(color: Colors.red.shade200),
+                shape: StadiumBorder(),
+              ),
+              child: Text(
+                l.signOutButton,
+                style: TextStyle(fontSize: 18, color: Colors.red, fontWeight: FontWeight.bold),
+              ),
+            )
+            ),
           SizedBox(height: 120),
         ],
       ),

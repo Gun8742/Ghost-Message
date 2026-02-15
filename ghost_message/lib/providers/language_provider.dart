@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-enum AppLang { th, en }
+enum AppLang { th, eng }
 
 class LanguageProvider extends ChangeNotifier {
   AppLang _lang = AppLang.th;
@@ -17,13 +17,13 @@ class LanguageProvider extends ChangeNotifier {
     return _lang == AppLang.th ? 0 : 1;
   }
 
-  void setLang(AppLang value) {
-    _lang = value;
-    notifyListeners();
-  }
-
-  void setLangIndex(int index) {
-    _lang = index == 0 ? AppLang.th : AppLang.en;
+  void setLanguage(String language) {
+    if (language == "th") {
+      _lang = AppLang.th;
+    }
+    else if (language == "eng") {
+      _lang = AppLang.eng;
+    }
     notifyListeners();
   }
 }

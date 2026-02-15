@@ -31,12 +31,18 @@ Widget _navItem(BuildContext context, int index, IconData icon, String label, Na
     onTap: () {
       navigationProvider.setIndex(index);
     },
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, color: isSelected ? Colors.black : Colors.blueGrey),
-        Text(label, style: TextStyle(color: isSelected ? Colors.black : Colors.blueGrey, fontSize: 11)),
-      ],
+    child: Container(
+      padding: EdgeInsets.all(15),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: isSelected ? Colors.black : Colors.blueGrey),
+          Text(label, style: TextStyle(color: isSelected ? Colors.black : Colors.blueGrey, fontSize: 11)),
+        ],
+      )
     )
   );
 }

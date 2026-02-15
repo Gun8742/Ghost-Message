@@ -2,17 +2,40 @@ import 'package:flutter/material.dart';
 import 'package:ghost_message/providers/navigation_provider.dart';
 import 'package:ghost_message/providers/language_provider.dart';
 import 'package:ghost_message/providers/l_provider.dart';
+import 'package:ghost_message/providers/theme_provider.dart';
+import 'package:ghost_message/providers/user_provider.dart';
 import 'package:ghost_message/screens/main_wrapper.dart';
+import 'package:ghost_message/screens/sign_in_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform
+  );
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => NavigationProvider()),
-        ChangeNotifierProvider(create: (context) => LanguageProvider()),
-
-        ProxyProvider<LanguageProvider, L>(
+        ChangeNotifierProvider(create: (context) => UserProvider()..initUser()),
+        ChangeNotifierProxyProvider<UserProvider, LanguageProvider>(
+          create: (context) => LanguageProvider(),
+          update: (context, userProvider, languageProvider) {
+            final String wLanguage = userProvider.currentUser?.language ?? "eng";
+            return languageProvider!..setLanguage(wLanguage);
+          },
+        ),
+        ChangeNotifierProxyProvider<UserProvider, ThemeProvider> (
+          create: (context) => ThemeProvider(),
+          update: (context, userProvider, themeProvider) {
+            final bool isDarkMode = userProvider.currentUser?.isDarkMode ?? false;
+            return themeProvider!..updateTheme(isDarkMode);
+          },
+        ),
+        ProxyProvider<LanguageProvider, L> (
           update: (context, langProvider, previous) {
             return L(langProvider.lang);
           },
@@ -28,12 +51,23 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeMode = Provider.of<ThemeProvider>(context);
     return MaterialApp(
       title: 'Ghost Message',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        primarySwatch: Colors.blue,
+        brightness: Brightness.light
       ),
-      home: MainWrapper()
+      darkTheme: ThemeData(
+        primarySwatch: Colors.indigo,
+        brightness: Brightness.dark
+      ),
+      themeMode: themeMode.themeMode,
+      initialRoute: FirebaseAuth.instance.currentUser == null ? "/sign-in" : "/main-wrapper",
+      routes: {
+        "/sign-in": (context) => SignInPage(),
+        "/main-wrapper": (context) => MainWrapper(),
+      }
     );
   }
 }

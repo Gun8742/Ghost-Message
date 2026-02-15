@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "20602388138",
+    "project_id": "ghost-message-acfb2",
+    "storage_bucket": "ghost-message-acfb2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:20602388138:android:cb425c239adb80c4ce9ad3",
+        "android_client_info": {
+          "package_name": "com.example.ghost_message"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyANtFwtnOywF8pnxOK7gZ_PO_xemcPpUFM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
