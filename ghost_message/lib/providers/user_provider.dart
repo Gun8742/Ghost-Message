@@ -25,8 +25,20 @@ class UserProvider extends ChangeNotifier {
   }
   
   void initUser() {
-    _userSubscription = _userFirestoreService.getUsers().listen((user) {
-    _allUsers = user;
+    _userSubscription = _userFirestoreService.getUsers().listen((users) {
+    _allUsers = users;
+
+    // final authUser = FirebaseAuth.instance.currentUser;
+    // if (authUser != null) {
+    //   final bool userExists = users.any((u) => u.uid == authUser.uid);
+    //   final creationTime = authUser.metadata.creationTime;
+    //   final bool isBrandNewUser = creationTime != null &&
+    //         DateTime.now().toUtc().difference(creationTime.toUtc()).inSeconds < 120;
+
+    //   if (!userExists && !isBrandNewUser) {
+    //       FirebaseAuth.instance.signOut();
+    //     }
+    // }
     notifyListeners();
     });
   }

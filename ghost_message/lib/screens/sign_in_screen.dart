@@ -16,25 +16,26 @@ class SignInPage extends StatelessWidget {
       ],
       actions: [
         AuthStateChangeAction<UserCreated> ((context, state) async {
+          
+          print("0");
           final user = state.credential.user;
           if (user != null) {
             String defaultUsername = "Ghost User";
-            if (user.displayName != null && user.displayName!.isNotEmpty) {
-              defaultUsername = user.displayName!;
-            } 
-            else if (user.email != null) {
-              defaultUsername = user.email!.split('@')[0];
+            try {
+              print("1");
+              await userFirestoreService.setupInitialUser(uid: user.uid, username: defaultUsername, email: user.email ?? "");
+              print("2");
+              await achievementFirestoreService.setupInitialAchievement(user.uid);
+              print("3");
             }
-            await userFirestoreService.setupInitialUser(uid: user.uid, username: defaultUsername, email: user.email ?? "");
-            await achievementFirestoreService.setupInitialAchievement(user.uid);
-          }
-          if (context.mounted) {
-            Navigator.pushReplacementNamed(context, "/main-wrapper");
+            catch(e) {
+              print("Database Setup Error: $e");
+            }
+            if (context.mounted) {
+              Navigator.pushReplacementNamed(context, "/main-wrapper");
+            }
           }
         }),
-        AuthStateChangeAction<SignedIn> ((context, state) {
-          Navigator.pushReplacementNamed(context, "/main-wrapper");
-        })
       ],
     );
   }
