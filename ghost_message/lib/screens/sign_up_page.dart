@@ -37,27 +37,23 @@ class _SignUpPageState extends State<SignUpPage> {
     });
 
     try {
-      print("1. เริ่มสมัครสมาชิก...");
       final user = await _authService.signUp(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim()
       );
       if (user != null) {
-        print("2. สมัคร Auth สำเร็จ -> กำลังบันทึก Database...");
         await _userFireStoreService.setupInitialUser(
           uid: user.uid,
           username: _usernameController.text.trim(),
           email: user.email!
         );
         await _achievementService.setupInitialAchievement(user.uid);
-        print("3. บันทึก Database สำเร็จ -> กำลังเปลี่ยนหน้า...");
         if (context.mounted) {
           Navigator.pushNamedAndRemoveUntil(context, "/main-wrapper", (route) => false);
         }
       }
     }
     catch(e) {
-      print("❌ Error เกิดขึ้น: $e");
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: $e")));
       }
