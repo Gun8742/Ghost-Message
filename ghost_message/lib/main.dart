@@ -6,6 +6,7 @@ import 'package:ghost_message/providers/theme_provider.dart';
 import 'package:ghost_message/providers/user_provider.dart';
 import 'package:ghost_message/screens/main_wrapper.dart';
 import 'package:ghost_message/screens/sign_in_screen.dart';
+import 'package:ghost_message/screens/sign_up_page.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -65,6 +66,7 @@ class MyApp extends StatelessWidget {
       themeMode: themeMode.themeMode,
       initialRoute: FirebaseAuth.instance.currentUser == null ? "/sign-in" : "/main-wrapper",
       routes: {
+        "/sign-up": (context) => SignUpPage(),
         "/sign-in": (context) => SignInPage(),
         "/main-wrapper": (context) => MainWrapper(),
       }

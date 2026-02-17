@@ -41,7 +41,7 @@ class UserFirestoreService {
       await _instance.collection("users").doc(user.uid).set(user.toMap());
     }
     catch(e) {
-      print(e);
+      rethrow;
     }
   }
   
