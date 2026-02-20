@@ -4,6 +4,7 @@ import 'package:ghost_message/providers/language_provider.dart';
 import 'package:ghost_message/providers/l_provider.dart';
 import 'package:ghost_message/providers/theme_provider.dart';
 import 'package:ghost_message/providers/user_provider.dart';
+import 'package:ghost_message/screens/admin/admin_dashboard.dart';
 import 'package:ghost_message/screens/main_wrapper.dart';
 import 'package:ghost_message/screens/sign_in_screen.dart';
 import 'package:ghost_message/screens/sign_up_page.dart';
@@ -69,6 +70,7 @@ class MyApp extends StatelessWidget {
         "/sign-up": (context) => SignUpPage(),
         "/sign-in": (context) => SignInPage(),
         "/main-wrapper": (context) => MainWrapper(),
+        "/admin-dashboard": (context) => AdminDashboard(),
       }
     );
   }

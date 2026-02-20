@@ -97,32 +97,47 @@ Widget buildAchievement(AchievementModel item, String uid) {
   );
 }
 
-Widget buildBadge() {
-  return Container(
-    width: 150,
-    height: 150,
-    padding: EdgeInsets.all(4), 
-    decoration: BoxDecoration(
-      color: Colors.white,
-      shape: BoxShape.circle,
-      border: Border.all(
-        color: Colors.grey.shade300,
-        width: 3.0, 
-      ),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black12,
-          blurRadius: 10,
-          offset: Offset(0, 5),
+Widget buildBadge(AchievementModel item, String uid) {
+  return Column(
+    children: [
+      Container(
+        width: 125,
+        height: 125,
+        padding: EdgeInsets.all(4), 
+        decoration: BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: Colors.grey.shade300,
+            width: 3.0, 
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 10,
+              offset: Offset(0, 5),
+            ),
+          ],
         ),
-      ],
-    ),
-    child: ClipOval(
-      child: Image.asset(
-        "assets/images/black.png",
-        fit: BoxFit.cover,
+        child: ClipOval(
+          child: Icon(Icons.emoji_events, size: 50, color: Colors.amber.shade200),
+        ),
       ),
-    ),
+      const SizedBox(height: 8),
+      SizedBox(
+          width: 100,
+          child: Text(
+            item.title,
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 12, 
+              fontWeight: FontWeight.bold
+            ),
+          ),
+        ),
+    ],
   );
 }
 

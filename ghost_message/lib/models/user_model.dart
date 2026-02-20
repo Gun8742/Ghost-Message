@@ -11,7 +11,7 @@ class UserModel {
   final String language;
   final DateTime createdAt;
   final DateTime lastActive;
-
+  final int reportCount;
   UserModel ({
     required this.uid,
     required this.email,
@@ -22,7 +22,8 @@ class UserModel {
     this.isDarkMode = false,
     this.language = "eng",
     required this.createdAt,
-    required this.lastActive
+    required this.lastActive,
+    this.reportCount = 0
   });
 
   factory UserModel.fromMap(String uid, Map<String, dynamic> data) {
@@ -36,7 +37,8 @@ class UserModel {
       isDarkMode: data["is_dark_mode"] ?? false,
       language: data["language"] ?? "eng",
       createdAt: (data["created_at"] as Timestamp).toDate(),
-      lastActive: (data["last_active"] as Timestamp).toDate()
+      lastActive: (data["last_active"] as Timestamp).toDate(),
+      reportCount: data["report_count"] ?? 0,
     );
   }
 
@@ -52,6 +54,7 @@ class UserModel {
       'language': language,
       'created_at': Timestamp.fromDate(createdAt),
       'last_active': FieldValue.serverTimestamp(),
+      'report_count' : reportCount,
     };
   }
 }

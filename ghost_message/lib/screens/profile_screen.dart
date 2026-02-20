@@ -79,6 +79,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           }
           final allAchievement = snapshot.data ?? [];
           final separatedAchievement = _chunkList(allAchievement, 4);
+          final finishedAchievement = allAchievement.where((i) => i.isCompleted).toList();
 
           return ListView(
             padding: EdgeInsets.all(12),
@@ -155,15 +156,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
               SizedBox(height: 20),
               SizedBox(
                 height: 180,
-                child: ListView(
+                child: ListView.builder(
                   padding: EdgeInsets.all(12),
                   scrollDirection: Axis.horizontal,
-                  children: [
-                    buildBadge(),
-                    buildBadge(),
-                    buildBadge(),
-                    buildBadge(),
-                  ],
+                  itemCount: finishedAchievement.length,
+                  itemBuilder: (context, index) {
+                   return buildBadge(finishedAchievement[index], currentUser.uid);
+                  },
                 ),
               ),
               SizedBox(height: 30),
@@ -231,3 +230,4 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 }
+

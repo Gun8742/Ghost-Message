@@ -427,7 +427,7 @@ class _SettingScreenState extends State<SettingScreen> {
                             fontWeight: FontWeight.bold,
                           )
                         )
-                      )
+                      ),
                     ],
                   )
                 );
@@ -444,6 +444,37 @@ class _SettingScreenState extends State<SettingScreen> {
               ),
             )
             ),
+          SizedBox(height: 30),
+          if (currentUser.role == "admin") ...[
+
+            Text(
+              textAlign: TextAlign.center,
+              "Admin",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 28,
+              )
+              ),
+            TextButton(
+              child: Text(
+                "Go to Admin DashBoard",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12
+                ),
+              ),
+              onPressed: () {
+                Navigator.pushNamed(context, "/admin-dashboard");
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                elevation: 0,
+                side: BorderSide(color: Colors.grey.shade200),
+                shape: StadiumBorder(),
+              ),
+            ),
+          ],
           SizedBox(height: 120),
         ],
       ),

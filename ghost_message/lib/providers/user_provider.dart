@@ -13,6 +13,11 @@ class UserProvider extends ChangeNotifier {
     return _allUsers;
   }
 
+  List<UserModel> get allReportedUser {
+
+    return _allUsers.where((user) => user.reportCount > 0).toList();
+  }
+
   UserModel? get currentUser {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null || _allUsers.isEmpty) return null;

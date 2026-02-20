@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:ghost_message/providers/theme_provider.dart';
+import 'package:ghost_message/providers/user_provider.dart';
 import 'package:ghost_message/services/auth_service.dart';
 import 'package:ghost_message/widgets/utility.dart';
+import 'package:provider/provider.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -18,6 +21,8 @@ class _SignInPageState extends State<SignInPage> {
   bool _isLoading = false;
 
   void _loginValidation() async {
+    final _themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    final _userProvider = Provider.of<UserProvider>(context, listen: false);
     if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please fill all fields")));
       return;
@@ -33,6 +38,7 @@ class _SignInPageState extends State<SignInPage> {
       );
       if (user != null) {
         if (context.mounted) {
+          _themeProvider.updateTheme(_userProvider.currentUser!.isDarkMode);
           Navigator.pushNamedAndRemoveUntil(context, "/main-wrapper", (route) => false);
         }
       }

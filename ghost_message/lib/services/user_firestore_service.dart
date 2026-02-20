@@ -36,6 +36,12 @@ class UserFirestoreService {
     });
   }
 
+  Future<void> reportUser(String uid, String reportedByUid) async {
+    await _instance.collection("users").doc(uid).update({
+      "report_count" : FieldValue.increment(1),
+    });
+  }
+
   Future<void> saveUserData(UserModel user) async {
     try {
       await _instance.collection("users").doc(user.uid).set(user.toMap());
@@ -54,6 +60,7 @@ class UserFirestoreService {
     String language = "eng", 
     int level = 1, 
     bool isDarkMode = false,
+    int reportCount = 0,
     }) async {
     final newUser = UserModel(
       uid: uid,
@@ -66,6 +73,7 @@ class UserFirestoreService {
       photoPath: photoPath,
       isDarkMode: isDarkMode,
       language: language,
+      reportCount: reportCount,
     );
     await saveUserData(newUser);
   }
