@@ -7,12 +7,16 @@ class AuthService {
     required String email,
     required String password,
   }) async {
+      // print(0);
     try {
+      // print(1);
       UserCredential userCredential = await _auth.createUserWithEmailAndPassword(email: email, password: password);
+      // print(2);
       return userCredential.user;
     }
     on FirebaseAuthException catch(e) {
-      throw e.message ?? "Registion failed";
+      print(e);
+      rethrow;
     }
   }
 
