@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ghost_message/providers/theme_provider.dart';
 import 'package:ghost_message/providers/user_provider.dart';
+import 'package:ghost_message/providers/l_provider.dart';
 import 'package:ghost_message/services/auth_service.dart';
 import 'package:ghost_message/widgets/utility.dart';
 import 'package:provider/provider.dart';
@@ -56,6 +57,10 @@ class _SignInPageState extends State<SignInPage> {
   }
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final bool isDark = themeProvider.isDarkMode;
+    final l = Provider.of<L>(context);
+
     return Scaffold(
       body: Center(
         child: SingleChildScrollView(
@@ -80,18 +85,18 @@ class _SignInPageState extends State<SignInPage> {
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _loginValidation,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white
+                    backgroundColor:  isDark ? ThemeProvider.buttonDark : ThemeProvider.buttonLight,
                   ),
                   child: _isLoading 
                     ? const CircularProgressIndicator(color: Colors.black)
-                    : const Text("Sign In", style: TextStyle(color: Colors.black, fontSize: 18)),
+                    : Text("Sign In", style: TextStyle(color: isDark ? ThemeProvider.textDark : ThemeProvider.textLight, fontSize: 18)),
                 ),
               ),
               TextButton(
                 onPressed: () {
                   Navigator.pushReplacementNamed(context, "/sign-up");
                 },
-                child: const Text("Doesn't have an account? Sign Up", style: TextStyle(color: Colors.grey)),
+                child: Text("Doesn't have an account? Sign Up", style: TextStyle(color: Colors.grey)),
               )
             ],
           ),

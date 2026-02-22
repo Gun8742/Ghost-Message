@@ -161,7 +161,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   scrollDirection: Axis.horizontal,
                   itemCount: finishedAchievement.length,
                   itemBuilder: (context, index) {
-                   return buildBadge(finishedAchievement[index], currentUser.uid);
+                   return buildBadge(context, finishedAchievement[index], currentUser.uid);
                   },
                 ),
               ),
@@ -176,7 +176,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 index: _selectIndex,
                 children:
                     separatedAchievement.map((items) {
-                      return achievementColumnBuild(items, currentUser.uid);
+                      return achievementColumnBuild(context, items, currentUser.uid);
                     }).toList(),
               ),
               Row(
@@ -207,9 +207,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     icon: Icon(
                       Icons.arrow_forward_ios,
                       color:
-                          _selectIndex < separatedAchievement.length - 1
-                              ? Colors.black
-                              : Colors.grey,
+                          _selectIndex < separatedAchievement.length - 1 ? Colors.black : Colors.grey,
                     ),
                     onPressed: () {
                       setState(() {

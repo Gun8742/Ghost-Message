@@ -1,26 +1,39 @@
 import 'package:flutter/material.dart';
 
-
 Widget buildSearchTextField({
   required TextEditingController searchController,
   required VoidCallback onFilterTap,
-  }) {
+
+  String hintText = "Search",
+  String filterText = "Filter",
+
+  Color? textColor,
+  Color? hintColor,
+  Color? fieldBgColor,
+  Color? borderColor,
+  Color? filterBgColor,
+  Color? filterTextColor,
+}) {
   return Row(
     children: [
       Expanded(
         child: TextField(
           controller: searchController,
+          style: TextStyle(color: textColor),
           decoration: InputDecoration(
-            hintText: "Search",
-            prefixIcon: const Icon(Icons.search),
+            filled: fieldBgColor != null,
+            fillColor: fieldBgColor,
+            hintStyle: TextStyle(color: hintColor),
+            prefixIcon: Icon(Icons.search, color: hintColor),
+            hintText: hintText,
             contentPadding: const EdgeInsets.symmetric(horizontal: 20),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
-              borderSide: const BorderSide(color: Colors.grey),
+              borderSide: BorderSide(color: borderColor ?? Colors.grey),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
-              borderSide: BorderSide(color: Colors.grey.shade300),
+              borderSide: BorderSide(color: borderColor ?? Colors.grey.shade300),
             ),
           ),
         ),
@@ -31,19 +44,19 @@ Widget buildSearchTextField({
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           decoration: BoxDecoration(
-            color: Colors.black,
+            color: filterBgColor ?? Colors.black,
             borderRadius: BorderRadius.circular(30),
           ),
           child: Row(
-            children: const [
+            children: [
               Text(
-                "Filter",
+                filterText,
                 style: TextStyle(
-                  color: Colors.white,
+                  color: filterTextColor ?? Colors.white,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              Icon(Icons.keyboard_arrow_down, color: Colors.white),
+              Icon(Icons.keyboard_arrow_down, color: filterTextColor ?? Colors.white),
             ],
           ),
         ),
@@ -57,6 +70,10 @@ Widget buildTabItem({
   required int selectedIndex,
   required ValueChanged<int> onTabSelected,
   bool isMainTab = false,
+
+  Color selectedColor = Colors.black,
+  Color unselectedColor = Colors.grey,
+  Color underlineColor = Colors.black,
 }) {
   return Row(
     children: List.generate(tabs.length, (index) {
@@ -67,7 +84,7 @@ Widget buildTabItem({
           margin: const EdgeInsets.only(right: 20),
           decoration: BoxDecoration(
             border: isSelected
-                ? const Border(bottom: BorderSide(color: Colors.black, width: 2))
+                ? Border(bottom: BorderSide(color: underlineColor, width: 2))
                 : null,
           ),
           padding: const EdgeInsets.only(bottom: 4),
@@ -76,7 +93,7 @@ Widget buildTabItem({
             style: TextStyle(
               fontSize: isMainTab ? 24 : 18,
               fontWeight: FontWeight.bold,
-              color: isSelected ? Colors.black : Colors.grey.shade400,
+              color: isSelected ? selectedColor : unselectedColor,
             ),
           ),
         ),
@@ -89,6 +106,11 @@ Widget buildDashboardListItem({
   required String title,
   required String buttonText,
   required VoidCallback onPressed,
+
+  Color titleColor = Colors.black,
+  Color avatarTextColor = Colors.deepPurple,
+  Color buttonBgColor = const Color(0xFF333333),
+  Color buttonTextColor = Colors.white,
 }) {
   return Container(
     padding: const EdgeInsets.symmetric(vertical: 8),
@@ -97,22 +119,39 @@ Widget buildDashboardListItem({
       children: [
         Row(
           children: [
-            const CircleAvatar(
+            CircleAvatar(
               backgroundColor: Colors.transparent,
-              child: Text("A", style: TextStyle(color: Colors.deepPurple, fontSize: 18, fontWeight: FontWeight.bold)),
+              child: Text(
+                "A",
+                style: TextStyle(
+                  color: avatarTextColor,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
             const SizedBox(width: 10),
-            Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: titleColor,
+              ),
+            ),
           ],
         ),
         ElevatedButton(
           onPressed: onPressed,
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF333333),
+            backgroundColor: buttonBgColor,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           ),
-          child: Text(buttonText, style: const TextStyle(color: Colors.white, fontSize: 14)),
+          child: Text(
+            buttonText,
+            style: TextStyle(color: buttonTextColor, fontSize: 14),
+          ),
         )
       ],
     ),

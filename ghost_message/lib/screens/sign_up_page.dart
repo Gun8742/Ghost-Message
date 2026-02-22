@@ -3,6 +3,8 @@ import 'package:ghost_message/services/achievement_firestore_service.dart';
 import 'package:ghost_message/services/auth_service.dart';
 import 'package:ghost_message/services/user_firestore_service.dart';
 import 'package:ghost_message/widgets/utility.dart';
+import 'package:provider/provider.dart';
+import 'package:ghost_message/providers/theme_provider.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -67,6 +69,9 @@ class _SignUpPageState extends State<SignUpPage> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final bool isDark = themeProvider.isDarkMode;
+
     return Scaffold(
       body: Center(
         child: SingleChildScrollView(
@@ -95,11 +100,11 @@ class _SignUpPageState extends State<SignUpPage> {
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _registerValidation,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white
+                    backgroundColor: isDark ? ThemeProvider.buttonDark : ThemeProvider.buttonLight
                   ),
                   child: _isLoading 
                     ? const CircularProgressIndicator(color: Colors.black)
-                    : const Text("Sign Up", style: TextStyle(color: Colors.black, fontSize: 18)),
+                    : Text("Sign Up", style: TextStyle(color: isDark ? ThemeProvider.textDark : ThemeProvider.textLight, fontSize: 18)),
                 ),
               ),
               TextButton(

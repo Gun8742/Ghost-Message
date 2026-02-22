@@ -15,9 +15,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   runApp(
     MultiProvider(
       providers: [
@@ -30,21 +29,21 @@ void main() async {
             return languageProvider!..setLanguage(wLanguage);
           },
         ),
-        ChangeNotifierProxyProvider<UserProvider, ThemeProvider> (
+        ChangeNotifierProxyProvider<UserProvider, ThemeProvider>(
           create: (context) => ThemeProvider(),
           update: (context, userProvider, themeProvider) {
             final bool isDarkMode = userProvider.currentUser?.isDarkMode ?? false;
             return themeProvider!..updateTheme(isDarkMode);
           },
         ),
-        ProxyProvider<LanguageProvider, L> (
+        ProxyProvider<LanguageProvider, L>(
           update: (context, langProvider, previous) {
             return L(langProvider.lang);
           },
         ),
       ],
-      child: const MyApp()
-    )
+      child: const MyApp(),
+    ),
   );
 }
 
@@ -53,25 +52,22 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeMode = Provider.of<ThemeProvider>(context);
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return MaterialApp(
       title: 'Ghost Message',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        brightness: Brightness.light
-      ),
-      darkTheme: ThemeData(
-        primarySwatch: Colors.indigo,
-        brightness: Brightness.dark
-      ),
-      themeMode: themeMode.themeMode,
+
+      theme: themeProvider.lightTheme,
+      darkTheme: themeProvider.darkTheme,
+      themeMode: themeProvider.themeMode,
+
       initialRoute: FirebaseAuth.instance.currentUser == null ? "/sign-in" : "/main-wrapper",
       routes: {
         "/sign-up": (context) => SignUpPage(),
         "/sign-in": (context) => SignInPage(),
         "/main-wrapper": (context) => MainWrapper(),
         "/admin-dashboard": (context) => AdminDashboard(),
-      }
+      },
     );
   }
 }

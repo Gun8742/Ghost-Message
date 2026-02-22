@@ -43,10 +43,41 @@ class L {
   String get confirmPassHint => lang == AppLang.th ? "ยืนยันรหัสผ่าน" : "confirm password";
 
   String get signOutButton => lang == AppLang.th ? "ออกจากระบบ" : "Sign Out";
-  String get confirmtoSignOutTitle => lang == AppLang.th ? "ยืนยันที่จะออกจากระบบหรือไม่" : "Are you sure want to SIGN OUT?";
+  String get confirmtoSignOutTitle =>
+      lang == AppLang.th ? "ยืนยันที่จะออกจากระบบหรือไม่" : "Are you sure want to SIGN OUT?";
+  String get adminButton => lang == AppLang.th ? "ไปหน้าแอดมิน" : "Go to admin dashboard";
 
-  //Profile Page
+  // Profile Page
   String get profileTitle => lang == AppLang.th ? "โปรไฟล์" : "Profile";
   String get badgeTitle => lang == AppLang.th ? "เหรียญตรา" : "Badge";
   String get achievementTitle => lang == AppLang.th ? "ความสำเร็จ" : "Achievement";
+
+  // Admin Dashboard
+  String get adminTitle => lang == AppLang.th ? "แอดมิน" : "Admin";
+  String get adminTabUser => lang == AppLang.th ? "ผู้ใช้" : "User";
+  String get adminTabMessage => lang == AppLang.th ? "ข้อความ" : "Message";
+
+  String get adminSubUserList => lang == AppLang.th ? "รายชื่อผู้ใช้" : "User List";
+  String get adminSubReportedUser => lang == AppLang.th ? "ผู้ใช้ถูกรายงาน" : "Reported User";
+  String get adminSubMessage => lang == AppLang.th ? "ข้อความ" : "Message";
+  String get adminSubReportedMessage => lang == AppLang.th ? "ข้อความถูกรายงาน" : "Reported Message";
+
+  String get adminSearchHint => lang == AppLang.th ? "ค้นหา" : "Search";
+  String get adminFilter => lang == AppLang.th ? "ตัวกรอง" : "Filter";
+
+  String get adminUserDetailBtn => lang == AppLang.th ? "ดูผู้ใช้" : "User Detail";
+  String get adminMessageDetailBtn => lang == AppLang.th ? "ดูข้อความ" : "Message Detail";
+
+  String get adminUid => "UID";
+  String get adminEmail => lang == AppLang.th ? "อีเมล" : "Email";
+  String get adminRole => lang == AppLang.th ? "บทบาท" : "Role";
+  String get adminLevel => lang == AppLang.th ? "เลเวล" : "Level";
+  String get adminLanguage => lang == AppLang.th ? "ภาษา" : "Language";
+  String get adminCreated => lang == AppLang.th ? "สร้างเมื่อ" : "Created";
+  String get adminLastActive => lang == AppLang.th ? "ใช้งานล่าสุด" : "Last Active";
+
+  String get adminReportedAccount => lang == AppLang.th ? "บัญชีถูกรายงาน" : "Reported Account";
+  String get adminCleanRecord => lang == AppLang.th ? "ปกติ" : "Clean Record";
+  String get adminReportedCountPrefix => lang == AppLang.th ? "มีผู้ใช้รายงาน " : "";
+  String get adminReportedCountSuffix => lang == AppLang.th ? " คน" : " users reported this user";
 }
