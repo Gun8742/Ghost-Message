@@ -76,6 +76,17 @@ class UserFirestoreService {
       rethrow;
     }
   }
+
+  Future<void> saveNewUsername(String newUsername, String uid) async {
+    try {
+      await _instance.collection("users").doc(uid).update({
+        "username" : newUsername,
+      });
+    }
+    catch (e) {
+      rethrow;
+    }
+  }
   
   Future<void> setupInitialUser({
     required String uid, 

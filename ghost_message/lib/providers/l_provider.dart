@@ -27,6 +27,7 @@ class L {
 
   String get sectionProfile => lang == AppLang.th ? "บัญชี" : "Profile";
   String get email => lang == AppLang.th ? "อีเมล" : "Email";
+  String get username => lang == AppLang.th ? "ชื่อผู้ใช้" : "Username";
   String get password => lang == AppLang.th ? "รหัสผ่าน" : "Password";
   String get edit => lang == AppLang.th ? "แก้ไข" : "Edit";
 
@@ -42,6 +43,7 @@ class L {
   String get confirm => lang == AppLang.th ? "ยืนยัน" : "Confirm";
   String get cancel => lang == AppLang.th ? "ยกเลิก" : "Cancel";
   String get newEmailHint => lang == AppLang.th ? "อีเมลใหม่" : "new email";
+  String get newUsernameHint => lang == AppLang.th ? "ชื่อผู้ใช้ใหม่" : "new username";
   
   String get oldPassHint => lang == AppLang.th ? "รหัสผ่านเดิม" : "old password";
   String get newPassHint => lang == AppLang.th ? "รหัสผ่านใหม่" : "new password";
@@ -66,6 +68,7 @@ class L {
   String get profileTitle => lang == AppLang.th ? "โปรไฟล์" : "Profile";
   String get badgeTitle => lang == AppLang.th ? "เหรียญตรา" : "Badge";
   String get achievementTitle => lang == AppLang.th ? "ความสำเร็จ" : "Achievement";
+  String get usernameChanged => lang == AppLang.th ? "เปลี่ยนชื่อผู้ใช้สำเร็จ" :  "Username Changed successfully.";
 
   // Admin Dashboard
   String get adminTitle => lang == AppLang.th ? "แอดมิน" : "Admin";

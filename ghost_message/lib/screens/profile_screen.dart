@@ -4,6 +4,7 @@ import 'package:ghost_message/providers/l_provider.dart';
 import 'package:ghost_message/providers/user_provider.dart';
 import 'package:ghost_message/services/achievement_firestore_service.dart';
 import 'package:ghost_message/widgets/achievement_list_build.dart';
+import 'package:ghost_message/widgets/utility.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -142,7 +143,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     SizedBox(width: 10),
                     IconButton(
                       icon: Icon(Icons.edit_square),
-                      onPressed: () {},
+                      onPressed: () {
+                        showEditUsernameDialog(context, l, currentUser.username);
+                      },
                     ),
                   ],
                 ),

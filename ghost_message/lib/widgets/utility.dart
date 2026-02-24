@@ -294,7 +294,7 @@ void showEditEmailDialog(
                                       onConfirm(newEmail);
                                       Navigator.pop(context);
                                       ScaffoldMessenger.of(context,).showSnackBar(
-                                        SnackBar(content: Text('เปลี่ยนอีเมลสำเร็จ'),
+                                        SnackBar(content: Text(l.emailChanged),
                                         ),
                                       );
                                     }
@@ -314,7 +314,148 @@ void showEditEmailDialog(
                                     );
                                   }
                                 } finally {
-                                  // 6. หยุดหมุนโหลด
+                                  if (context.mounted) {
+                                    setState(() => isLoading = false);
+                                  }
+                                }
+                              },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        shape: const StadiumBorder(),
+                      ),
+                      child:
+                          isLoading
+                              ? const SizedBox(
+                                height: 24,
+                                width: 24,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 3,
+                                ),
+                              )
+                              : Text(
+                                l.confirm,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  color: ThemeProvider.textDark,
+                                ),
+                              ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  SizedBox(
+                    width: double.infinity,
+                    height: 52,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            isDark
+                                ? ThemeProvider.fieldDark
+                                : ThemeProvider.buttonLight,
+                        elevation: 0,
+                        shape: const StadiumBorder(),
+                      ),
+                      child: Text(
+                        l.cancel,
+                        style: TextStyle(fontSize: 18, color: titleColor),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    },
+  );
+}
+void showEditUsernameDialog( BuildContext context, L l, String currentUsername,) {
+  final TextEditingController controller = TextEditingController(text: currentUsername,);
+  bool isLoading = false;
+  final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+  final _firebaseUserService = UserFirestoreService();
+  final currentUser = Provider.of<UserProvider>(context, listen: false).currentUser;
+  final bool isDark = themeProvider.isDarkMode;
+
+  showDialog(
+    context: context,
+    builder: (context) {
+      final titleColor = isDark ? ThemeProvider.textDark : ThemeProvider.textLight;
+
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(25),
+            ),
+            backgroundColor: Theme.of(context).dialogTheme.backgroundColor,
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l.username,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: titleColor,
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+
+                  _buildDialogField(
+                    context: context,
+                    controller: controller,
+                    hint: l.newUsernameHint,
+                    obscureText: false,
+                  ),
+
+                  const SizedBox(height: 18),
+
+                  SizedBox(
+                    width: double.infinity,
+                    height: 52,
+                    child: ElevatedButton(
+                      onPressed:
+                          isLoading
+                              ? null
+                              : () async {
+                                final String newUsername = controller.text.trim();
+
+                                if (newUsername.isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(l.fulfillTheBox)),
+                                  );
+                                  return;
+                                }
+
+                                setState(() => isLoading = true);
+
+                                try {
+                                    await _firebaseUserService.saveNewUsername(newUsername, currentUser!.uid);
+                                    if (context.mounted) {
+                                      Navigator.pop(context);
+                                      ScaffoldMessenger.of(context,).showSnackBar(
+                                        SnackBar(content: Text(l.usernameChanged),
+                                        ),
+                                      );
+                                    }
+                                  }
+                                catch (e) {
+                                  String errorMessage = l.errorMessage;
+
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text(errorMessage)),
+                                    );
+                                  }
+                                } finally {
                                   if (context.mounted) {
                                     setState(() => isLoading = false);
                                   }
