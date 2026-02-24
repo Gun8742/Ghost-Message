@@ -4,6 +4,9 @@ class L {
   final AppLang lang;
   L(this.lang);
 
+  String get errorMessage => lang == AppLang.th ? "เกิดข้อผิดพลาดกรุณาลองใหม่อีกครั้ง" : "There's some problem try again later.";
+
+
   // Bottom Nav
   String get navProfile => lang == AppLang.th ? "โปรไฟล์" : "Profile";
   String get navHome => lang == AppLang.th ? "หน้าแรก" : "Home";
@@ -39,6 +42,8 @@ class L {
   String get confirm => lang == AppLang.th ? "ยืนยัน" : "Confirm";
   String get cancel => lang == AppLang.th ? "ยกเลิก" : "Cancel";
   String get newEmailHint => lang == AppLang.th ? "อีเมลใหม่" : "new email";
+  
+  String get oldPassHint => lang == AppLang.th ? "รหัสผ่านเดิม" : "old password";
   String get newPassHint => lang == AppLang.th ? "รหัสผ่านใหม่" : "new password";
   String get confirmPassHint => lang == AppLang.th ? "ยืนยันรหัสผ่าน" : "confirm password";
 
@@ -46,6 +51,16 @@ class L {
   String get confirmtoSignOutTitle =>
       lang == AppLang.th ? "ยืนยันที่จะออกจากระบบหรือไม่" : "Are you sure want to SIGN OUT?";
   String get adminButton => lang == AppLang.th ? "ไปหน้าแอดมิน" : "Go to admin dashboard";
+
+  String get fulfillTheBox => lang == AppLang.th ? "กรุณากรอกข้อมูลให้ครบ" :  "Please fill in the blank.";
+  String get passwordNotMatched => lang == AppLang.th ? "รหัสผ่านไม่ตรงกัน" :  "Passwords do not match.";
+  String get passwordNeedAtLeast => lang == AppLang.th ? "รหัสผ่านต้องการอย่างน้อย 6 ตัวอักษร" :  "A password requiring at least 6 characters.";
+  String get passwordChanged => lang == AppLang.th ? "เปลี่ยนรหัสผ่านเรียบร้อยแล้ว" :  "Password changed successfully.";
+  String get wrongOldPassword => lang == AppLang.th ? "รหัสผ่านเดิมไม่ถูกต้อง" :  "The previous password is incorrect.";
+  String get wrongPassword => lang == AppLang.th ? "รหัสผ่านไม่ถูกต้อง" :  "The password is incorrect.";
+  String get invalidEmail => lang == AppLang.th ? "รูปแบบอีเมลไม่ถูกต้อง" :  "The email format is incorrect.";
+  String get emailAlreadyInUse => lang == AppLang.th ? "อีเมลนี้มีผู้ใช้งานแล้ว" :  "Email already in use";
+  String get emailChanged => lang == AppLang.th ? "เปลี่ยนอีเมลสำเร็จ" :  "Email Changed successfully.";
 
   // Profile Page
   String get profileTitle => lang == AppLang.th ? "โปรไฟล์" : "Profile";

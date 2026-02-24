@@ -26,25 +26,51 @@ class UserFirestoreService {
   }
 
   Future<void> updateTheme(String uid, bool isDark) async {
-    await _instance.collection("users").doc(uid).update({
-      "is_dark_mode": isDark
-    });
+    try {
+      await _instance.collection("users").doc(uid).update({
+        "is_dark_mode": isDark
+      });
+    }
+    catch(e) {
+      rethrow;
+    }
   }
   Future<void> updateLanguage(String uid, String language) async {
-    await _instance.collection("users").doc(uid).update({
+    try {
+      await _instance.collection("users").doc(uid).update({
       "language": language,
     });
+    }
+    catch (e) {
+      rethrow;
+    }
   }
 
   Future<void> reportUser(String uid, String reportedByUid) async {
-    await _instance.collection("users").doc(uid).update({
-      "report_count" : FieldValue.increment(1),
-    });
+    try {
+      await _instance.collection("users").doc(uid).update({
+        "report_count" : FieldValue.increment(1),
+      });
+    }
+    catch (e) {
+      rethrow;
+    }
   }
 
   Future<void> saveUserData(UserModel user) async {
     try {
       await _instance.collection("users").doc(user.uid).set(user.toMap());
+    }
+    catch(e) {
+      rethrow;
+    }
+  }
+
+  Future<void> saveNewEmail(String email, String uid) async {
+    try {
+      await _instance.collection("users").doc(uid).update({
+        "email" : email,
+      });
     }
     catch(e) {
       rethrow;

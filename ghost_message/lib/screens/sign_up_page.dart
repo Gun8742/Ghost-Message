@@ -49,7 +49,9 @@ class _SignUpPageState extends State<SignUpPage> {
           username: _usernameController.text.trim(),
           email: user.email!
         );
+        print("wait for setup achievement");
         await _achievementService.setupInitialAchievement(user.uid);
+        print("done setup achievement");
         if (context.mounted) {
           Navigator.pushNamedAndRemoveUntil(context, "/main-wrapper", (route) => false);
         }

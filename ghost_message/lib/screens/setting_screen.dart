@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ghost_message/providers/navigation_provider.dart';
 import 'package:ghost_message/providers/theme_provider.dart';
 import 'package:ghost_message/providers/user_provider.dart';
+import 'package:ghost_message/services/auth_service.dart';
 import 'package:ghost_message/services/user_firestore_service.dart';
 import 'package:provider/provider.dart';
 import 'package:ghost_message/providers/l_provider.dart';
@@ -23,6 +24,7 @@ class _SettingScreenState extends State<SettingScreen> {
   bool _location = true;
 
   final UserFirestoreService _userFirestoreService = UserFirestoreService();
+  final AuthService _authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
@@ -89,6 +91,7 @@ class _SettingScreenState extends State<SettingScreen> {
             valueText: email,
             editText: l.edit,
             onEdit: () {
+              
               showEditEmailDialog(context, l, email, (newVal) {
                 setState(() {
                   email = newVal;
