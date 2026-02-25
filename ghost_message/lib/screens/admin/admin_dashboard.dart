@@ -19,6 +19,19 @@ class _AdminDashboardState extends State<AdminDashboard> {
   final TextEditingController _searchController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    _searchController.addListener(() {
+      setState(() {});
+    });
+  }
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
     final l = Provider.of<L>(context);
@@ -30,8 +43,20 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
     final List<String> _messages = List.generate(
       10,
-      (index) => "lalaaldlawdadw",
+      (index) => "Message: $index",
     );
+
+    final String query = _searchController.text.toLowerCase();
+    final filteredUsers = _users.where((user) => 
+      user.username.toLowerCase().contains(query) || user.email.toLowerCase().contains(query)
+    ).toList();
+    final filteredReported = _reportedUser.where((user) => 
+      user.username.toLowerCase().contains(query)
+    ).toList();
+
+    final filteredMessages = _messages.where((message) => 
+      message.toLowerCase().contains(query)
+    ).toList();
 
     final isUserTab = _selectedMainTab == 0;
     final bool isAllUserTab = _selectedSubTab == 0;
@@ -40,7 +65,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         ? [l.adminSubUserList, l.adminSubReportedUser]
         : [l.adminSubMessage, l.adminSubReportedMessage];
 
-    final currentList = isUserTab ? (isAllUserTab ? _users : _reportedUser) : _messages;
+    final currentList = isUserTab ? (isAllUserTab ? filteredUsers : filteredReported) : filteredMessages;
     final buttonText = isUserTab ? l.adminUserDetailBtn : l.adminMessageDetailBtn;
 
     return Scaffold(
@@ -112,12 +137,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     return const SizedBox(height: 10);
                   },
                   itemBuilder: (context, index) {
+                    final item = currentList[index];
+
                     return buildDashboardListItem(
-                      title: isUserTab
-                          ? (isAllUserTab
-                              ? _users[index].username
-                              : (_reportedUser.length > 0 ? _reportedUser[index].username : ""))
-                          : _messages[index],
+                      title: isUserTab 
+                          ? (item as UserModel).username 
+                          : item as String,
                       buttonText: buttonText,
                       titleColor: isDark ? ThemeProvider.textDark : ThemeProvider.textLight,
                       buttonBgColor: isDark ? ThemeProvider.buttonDark : ThemeProvider.buttonLight,

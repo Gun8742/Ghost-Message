@@ -87,6 +87,17 @@ class UserFirestoreService {
       rethrow;
     }
   }
+
+  Future<void> updateProfilePicture(String uid, String downloadURL) async {
+    try {
+      await _instance.collection("users").doc(uid).update({
+        "photo_path" : downloadURL,
+      });
+    }
+    catch (e) {
+      rethrow;
+    }
+  }
   
   Future<void> setupInitialUser({
     required String uid, 

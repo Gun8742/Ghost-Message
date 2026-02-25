@@ -46,6 +46,8 @@
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>Need camera access for AR mode.</string>
+	<string>Need camera access for AR mode and ถ่ายรูปโปรไฟล์</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>แอปพลิเคชันต้องการเข้าถึงอัลบั้มเพื่อเลือกรูปโปรไฟล์</string>
 </dict>
 </plist>

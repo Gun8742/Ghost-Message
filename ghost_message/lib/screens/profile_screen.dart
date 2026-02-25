@@ -3,10 +3,13 @@ import 'package:ghost_message/models/achievement_model.dart';
 import 'package:ghost_message/providers/l_provider.dart';
 import 'package:ghost_message/providers/user_provider.dart';
 import 'package:ghost_message/services/achievement_firestore_service.dart';
+import 'package:ghost_message/services/user_firestore_service.dart';
 import 'package:ghost_message/widgets/achievement_list_build.dart';
 import 'package:ghost_message/widgets/utility.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:ghost_message/services/image_service.dart';
+import 'dart:io';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -17,6 +20,8 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   int _selectIndex = 0;
+  File? _imageFile;
+  final _imageService = ImageService();
   final AchievementFirestoreService _achievementFirestoreService = AchievementFirestoreService();
   late Stream<List<AchievementModel>> _achievementStream;
 
@@ -109,19 +114,52 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ],
                       ),
                       child: ClipOval(
-                        child: Image.asset(
+                        child: _imageFile != null ? Image.file(
+                          _imageFile!,
+                          fit: BoxFit.cover,
+                          width: 200,
+                          height: 200,
+                        ) : (currentUser.photoPath?.isNotEmpty ?? false 
+                        ? Image.network(
+                          currentUser.photoPath!,
+                          fit: BoxFit.cover,
+                          width: 200,
+                          height: 200,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return const Center(child: CircularProgressIndicator());
+                          },
+                        ) : Image.asset(
                           "assets/images/black.png",
                           fit: BoxFit.cover,
-                        ),
+                        )),
+                        )
                       ),
                     ),
-                  ),
                   Positioned(
                     right: 80,
                     bottom: 0,
                     child: IconButton(
                       icon: Icon(Icons.edit_square),
-                      onPressed: () {},
+                      onPressed: () {
+                        _imageService.showImageOptions(
+                          context: context,
+                          onImageSelected: (File file) async {
+                            setState(() {
+                              _imageFile = file;
+                            });
+                            final String uid = currentUser.uid;
+                            String? url = await _imageService.uploadProfileImage(uid, file);
+
+                            if (url != null) {
+                              await UserFirestoreService().updateProfilePicture(uid, url);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text("Profile picture updated!")),
+                              );
+                            }
+                          }
+                        );
+                      },
                     ),
                   ),
                 ],

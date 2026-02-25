@@ -3,6 +3,7 @@ import 'package:ghost_message/providers/l_provider.dart';
 import 'package:ghost_message/providers/user_provider.dart';
 import 'package:ghost_message/services/auth_service.dart';
 import 'package:ghost_message/services/user_firestore_service.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:ghost_message/providers/theme_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -35,6 +36,10 @@ Widget buildSectionTitle(String text) {
       const SizedBox(height: 15),
     ],
   );
+}
+
+Future<void> pickImage(ImageSource source) async {
+  
 }
 
 Widget buildSettingSwitchRow({
