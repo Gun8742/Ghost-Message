@@ -764,36 +764,82 @@ class GhostSwitch extends StatelessWidget {
   }
 }
 
-// Widget buildPillButton({
-//   required BuildContext context,
-//   required String text,
-//   required VoidCallback onPressed,
-// }) {
-//   final isDark = Theme.of(context).brightness == Brightness.dark;
+void showGhostPostDialog({
+  required BuildContext context,
+  required String authorName,
+  required bool isAnonymous,
+  required String message,
+  required VoidCallback onReport,
+}) {
+  showDialog(
+    context: context,
+    barrierDismissible: true,
+    builder: (context) {
+      return Dialog(
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(6)),
+        ),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(18, 14, 18, 14),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Text(
+                          isAnonymous ? "Anonymous" : authorName,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(width: 10),
+                        const Icon(Icons.warning_amber_rounded, color: Colors.red, size: 26),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.close),
+                  ),
+                ],
+              ),
 
-//   final bg = isDark ? ThemeProvider.buttonDark : const Color.fromARGB(255, 202, 23, 23);
-//   final border = isDark ? Colors.grey.shade700 : Colors.grey.shade300;
-//   final textColor = Theme.of(context).textTheme.bodyMedium?.color ?? (isDark ? ThemeProvider.textDark : Colors.black);
+              const Divider(height: 16, thickness: 1),
 
-//   return SizedBox(
-//     width: double.infinity,
-//     height: 55,
-//     child: ElevatedButton(
-//       onPressed: onPressed,
-//       style: ElevatedButton.styleFrom(
-//         backgroundColor: bg,
-//         elevation: 0,
-//         shape: const StadiumBorder(),
-//         side: BorderSide(color: border),
-//       ),
-//       child: Text(
-//         text,
-//         style: TextStyle(
-//           fontSize: 16,
-//           fontWeight: FontWeight.bold,
-//           color: textColor,
-//         ),
-//       ),
-//     ),
-//   );
-// }
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  message,
+                  style: const TextStyle(fontSize: 16, height: 1.35),
+                ),
+              ),
+
+              const SizedBox(height: 18),
+              const Divider(height: 16, thickness: 1),
+
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () {
+                    onReport();
+                    Navigator.pop(context);
+                  },
+                  child: const Text(
+                    "Report",
+                    style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}

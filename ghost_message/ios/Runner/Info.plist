@@ -49,5 +49,9 @@
 	<string>Need camera access for AR mode and ถ่ายรูปโปรไฟล์</string>
     <key>NSPhotoLibraryUsageDescription</key>
     <string>แอปพลิเคชันต้องการเข้าถึงอัลบั้มเพื่อเลือกรูปโปรไฟล์</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>แอปต้องใช้ตำแหน่งเพื่อแสดงตำแหน่งของคุณและอ่านข้อความตามสถานที่</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>แอปต้องใช้ตำแหน่งเพื่อฟีเจอร์ข้อความตามสถานที่</string>
 </dict>
 </plist>
