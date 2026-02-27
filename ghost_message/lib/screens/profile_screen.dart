@@ -6,6 +6,7 @@ import 'package:ghost_message/services/achievement_firestore_service.dart';
 import 'package:ghost_message/services/user_firestore_service.dart';
 import 'package:ghost_message/widgets/achievement_list_build.dart';
 import 'package:ghost_message/widgets/utility.dart';
+import 'package:ghost_message/screens/leaderboard_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ghost_message/services/image_service.dart';
@@ -212,6 +213,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 l.achievementTitle,
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
               ),
+              SizedBox(height: 10),
+
+              SizedBox(
+                width: double.infinity,
+                height: 45,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const LeaderboardScreen(),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    elevation: 0,
+                    shape: const StadiumBorder(),
+                  ),
+                  child: Text(
+                    l.leaderboardButton,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+
               SizedBox(height: 30),
               IndexedStack(
                 index: _selectIndex,
