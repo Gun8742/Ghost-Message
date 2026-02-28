@@ -99,6 +99,12 @@ class L {
   String get adminReportedCountPrefix => lang == AppLang.th ? "มีผู้ใช้รายงาน " : "";
   String get adminReportedCountSuffix => lang == AppLang.th ? " คน" : " users reported this user";
 
+  // Leaderboard  
+  String get leaderboardTitle => lang == AppLang.th ? "อันดับ" : "Leaderboard";
+  String get leaderboardPostTab => lang == AppLang.th ? "จำนวนโพสต์" : "Posts";
+  String get leaderboardLikeTab => lang == AppLang.th ? "ไลก์" : "Likes";
+  String get leaderboardButton => lang == AppLang.th ? "ตารางอันดับ" : "Leaderboard";
+
   //HOme page
 
   String get postTitle => lang == AppLang.th ? "โพสต์" : "Post";
