@@ -17,6 +17,24 @@ class UserProvider extends ChangeNotifier {
 
     return _allUsers.where((user) => user.reportCount > 0).toList();
   }
+  String getUsernameById(String uid) {
+    try {
+        final user = allUser.firstWhere((user) => user.uid == uid);
+        return user.username;
+      } 
+    catch (e) {
+      return "Anonymous";
+    }
+  }
+
+  String? getPhotoPath(String uid) {
+      try {
+        final user = allUser.firstWhere((u) => u.uid == uid);
+        return user.photoPath; 
+      } catch (e) {
+        return null;
+      }
+    }
 
   UserModel? get currentUser {
     final uid = FirebaseAuth.instance.currentUser?.uid;

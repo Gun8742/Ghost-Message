@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 enum ReportType { user, message }
 
 class ReportModel {
@@ -21,11 +23,12 @@ class ReportModel {
 
   Map<String, dynamic> toMap() {
     return {
-      'type': type.name, 
-      'target_id': targetId,
-      'reported_by_uid': reportedByUid,
-      'reason': reason,
-      'is_checked': isChecked,
+      "type": type.name, 
+      "target_id": targetId,
+      "reported_by_uid": reportedByUid,
+      "reason": reason,
+      "is_checked": isChecked,
+      "created_at": FieldValue.serverTimestamp(),
     };
   }
 
@@ -36,12 +39,12 @@ class ReportModel {
         (e) => e.name == map["type"],
         orElse: () => ReportType.user,
       ),
-      targetId: map['target_id'] ?? '',
-      reportedByUid: map['reported_by_uid'] ?? '',
-      reason: map['reason'] ?? '',
-      isChecked: map['is_checked'] ?? false,
-      createdAt: map['created_at'] != null 
-          ? map['created_at'].toDate() 
+      targetId: map["target_id"] ?? "",
+      reportedByUid: map["reported_by_uid"] ?? "",
+      reason: map["reason"] ?? "",
+      isChecked: map["is_checked"] ?? false,
+      createdAt: map["created_at"] != null 
+          ? map["created_at"].toDate() 
           : DateTime.now(),
     );
   }

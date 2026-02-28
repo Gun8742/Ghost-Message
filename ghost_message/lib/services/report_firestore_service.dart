@@ -22,7 +22,7 @@ class ReportFirestoreService {
       "target_id": targetId,
       "reported_by_uid": reportedByUid,
       "reason": reason,
-      "status": "pending",
+      "is_checked": false,
       "created_at": FieldValue.serverTimestamp(),
     });
 
@@ -33,7 +33,7 @@ class ReportFirestoreService {
       });
     }
     else if (type == ReportType.message) {
-      final messageRef = _instance.collection("messsage").doc(targetId);
+      final messageRef = _instance.collection("posts").doc(targetId);
       batch.update(messageRef, {
         "report_count": FieldValue.increment(1),
       });
@@ -48,7 +48,7 @@ class ReportFirestoreService {
   }
 
   CollectionReference? get _reportData {
-    return _instance.collection("report");
+    return _instance.collection("reports");
   }
 
   Stream<QuerySnapshot> getReportStream() {

@@ -110,42 +110,8 @@ class MapService {
     );
   }
 
-  List<PostModel> getMockPosts() {
-    return [
-      PostModel(
-        id: "m1",
-        message: "ข้อความข้อความข้อความข้อความข้อความข้อความข้อความข้อความข้อความข้อความข้อความข้อความข้อความข้อความข้อความ",
-        latitude: 13.850417565067216,
-        longitude: 100.55878536834231,
-      ),
-      PostModel(
-        id: "m2",
-        message: "ข้อความข้อความข้อความข้อความข้อความข้อความข้อความข้อความ",
-        latitude: 13.845872712316153,
-        longitude: 100.57127375530446,
-      ),
-      PostModel(
-        id: "m3",
-        message: "ข้อความ",
-        latitude: 13.847980,
-        longitude: 100.571390,
-      ),
-      PostModel(
-        id: "m4",
-        message: "ข้อความ",
-        latitude: 13.848150,
-        longitude: 100.571900,
-      ),
-      PostModel(
-        id: "m5",
-        message: "ข้อความ",
-        latitude: 13.848330,
-        longitude: 100.571620,
-      ),
-    ];
-  }
 
-  Set<Marker> buildMockPostMarkers({
+  Set<Marker> buildPostMarkers({
     required List<PostModel> posts,
     required void Function(PostModel post) onTapMarker,
   }) {
@@ -154,7 +120,7 @@ class MapService {
     for (PostModel post in posts) {
       markers.add(
         Marker(
-          markerId: MarkerId("post_${post.id}"),
+          markerId: MarkerId("post_${post.postId}"),
           position: post.latLng,
           icon: _ghostPostMarkerIcon ?? BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRose),
           infoWindow: const InfoWindow(
