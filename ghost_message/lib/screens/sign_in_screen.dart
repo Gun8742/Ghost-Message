@@ -24,6 +24,7 @@ class _SignInPageState extends State<SignInPage> {
   void _loginValidation() async {
     final _themeProvider = Provider.of<ThemeProvider>(context, listen: false);
     final _userProvider = Provider.of<UserProvider>(context, listen: false);
+    
     if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please fill all fields")));
       return;
@@ -67,17 +68,17 @@ class _SignInPageState extends State<SignInPage> {
           padding: const EdgeInsets.all(24),
           child: Column(
             children: [
-             const Text(
-              "Sign In",
+             Text(
+              l.signIn,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 36
                 )
               ),
               const SizedBox(height: 30),
-              buildTextField(ctrl: _emailController, label: "Email", icon: Icons.email),
+              buildTextField(ctrl: _emailController, label: l.email, icon: Icons.email),
               const SizedBox(height: 30),
-              buildTextField(ctrl: _passwordController, label: "Password", icon: Icons.lock, isPassword: true),
+              buildTextField(ctrl: _passwordController, label: l.password, icon: Icons.lock, isPassword: true),
               const SizedBox(height: 30),
               SizedBox(
                 width: double.infinity,
@@ -89,14 +90,14 @@ class _SignInPageState extends State<SignInPage> {
                   ),
                   child: _isLoading 
                     ? const CircularProgressIndicator(color: Colors.black)
-                    : Text("Sign In", style: TextStyle(color: isDark ? ThemeProvider.textDark : ThemeProvider.textLight, fontSize: 18)),
+                    : Text(l.signIn, style: TextStyle(color: isDark ? ThemeProvider.textDark : ThemeProvider.textLight, fontSize: 18)),
                 ),
               ),
               TextButton(
                 onPressed: () {
                   Navigator.pushReplacementNamed(context, "/sign-up");
                 },
-                child: Text("Doesn't have an account? Sign Up", style: TextStyle(color: Colors.grey)),
+                child: Text(l.noHaveAccount, style: TextStyle(color: Colors.grey)),
               )
             ],
           ),

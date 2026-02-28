@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ghost_message/providers/l_provider.dart';
 import 'package:ghost_message/services/achievement_firestore_service.dart';
 import 'package:ghost_message/services/auth_service.dart';
 import 'package:ghost_message/services/user_firestore_service.dart';
@@ -73,6 +74,7 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final bool isDark = themeProvider.isDarkMode;
+    final l = Provider.of<L>(context);
 
     return Scaffold(
       body: Center(
@@ -80,21 +82,21 @@ class _SignUpPageState extends State<SignUpPage> {
           padding: const EdgeInsets.all(24),
           child: Column(
             children: [
-             const Text(
-              "Sign Up",
+              Text(
+              l.signUp,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 36
                 )
               ),
               const SizedBox(height: 30),
-              buildTextField(ctrl: _usernameController, label: "Username", icon: Icons.person),
+              buildTextField(ctrl: _usernameController, label: l.username, icon: Icons.person),
               const SizedBox(height: 30),
-              buildTextField(ctrl: _emailController, label: "Email", icon: Icons.email),
+              buildTextField(ctrl: _emailController, label: l.email, icon: Icons.email),
               const SizedBox(height: 30),
-              buildTextField(ctrl: _passwordController, label: "Password", icon: Icons.lock, isPassword: true),
+              buildTextField(ctrl: _passwordController, label: l.password, icon: Icons.lock, isPassword: true),
               const SizedBox(height: 30),
-              buildTextField(ctrl: _confirmPasswordController, label: "Confirm Password", icon: Icons.lock, isPassword: true),
+              buildTextField(ctrl: _confirmPasswordController, label: l.confirmPassword, icon: Icons.lock, isPassword: true),
               const SizedBox(height: 30),
               SizedBox(
                 width: double.infinity,
@@ -106,14 +108,14 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                   child: _isLoading 
                     ? const CircularProgressIndicator(color: Colors.black)
-                    : Text("Sign Up", style: TextStyle(color: isDark ? ThemeProvider.textDark : ThemeProvider.textLight, fontSize: 18)),
+                    : Text(l.signUp, style: TextStyle(color: isDark ? ThemeProvider.textDark : ThemeProvider.textLight, fontSize: 18)),
                 ),
               ),
               TextButton(
                 onPressed: () {
                   Navigator.pushReplacementNamed(context, "/sign-in");
                 },
-                child: const Text("Already have an account? Sign In", style: TextStyle(color: Colors.grey)),
+                child: Text(l.haveAccount, style: TextStyle(color: Colors.grey)),
               )
             ],
           ),

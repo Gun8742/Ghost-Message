@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:ghost_message/providers/l_provider.dart';
 import 'package:ghost_message/providers/theme_provider.dart';
 import 'package:ghost_message/providers/user_provider.dart';
 import 'package:ghost_message/services/post_service.dart';
@@ -59,12 +60,9 @@ class _HomeScreenState extends State<HomeScreen> {
         _isLoading = false;
       });
 
+      final l = Provider.of<L>(context, listen: false);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            "ไม่สามารถใช้งานตำแหน่งได้ กรุณาเปิด Location และ Permission",
-          ),
-        ),
+        SnackBar(content: Text(l.locationPermissionDenied)),
       );
       return;
     }
@@ -151,9 +149,10 @@ class _HomeScreenState extends State<HomeScreen> {
     if (canOpen) {
       final userProvider = Provider.of<UserProvider>(context, listen: false);
       final currentUser = userProvider.currentUser;
+      final l = Provider.of<L>(context, listen: false);
       if (currentUser == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("กรุณาล็อกอินก่อนดูข้อความ 👻")),
+          SnackBar(content: Text(l.pleaseLoginFirst)),
         );
         return;
       }
@@ -171,11 +170,10 @@ class _HomeScreenState extends State<HomeScreen> {
     } else {
       final double remain = distance - 20;
 
+      final l = Provider.of<L>(context, listen: false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            "ไกลเกิน 20 เมตร ❌ (ห่าง ${distance.toStringAsFixed(1)} m)\nต้องเข้าใกล้อีก ${remain.toStringAsFixed(1)} m",
-          ),
+          content: Text(l.distanceTooFar(distance.toStringAsFixed(1), remain.toStringAsFixed(1))),
           duration: const Duration(seconds: 2),
         ),
       );
@@ -198,9 +196,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _showCreatePostSheet() {
+    final l = Provider.of<L>(context, listen: false);
     if (_myPosition == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("กำลังหาพิกัดของคุณ... รอก่อนนะ 👻")),
+        SnackBar(content: Text(l.findingLocation)),
       );
       return;
     }
@@ -234,7 +233,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "👻 ทิ้งข้อความผีไว้ที่นี่...",
+                    l.createPostTitle,
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -250,7 +249,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       color: isDark ? Colors.white : Colors.black,
                     ),
                     decoration: InputDecoration(
-                      hintText: "พิมพ์ความลับของคุณ...",
+                      hintText: l.createPostHint,
                       hintStyle: const TextStyle(color: Colors.grey),
                       filled: true,
                       fillColor: isDark ? Colors.black26 : Colors.grey[100],
@@ -286,19 +285,19 @@ class _HomeScreenState extends State<HomeScreen> {
                                       );
                                   final currentUser = userProvider.currentUser;
                                   if (currentUser == null)
-                                    throw Exception("กรุณาล็อกอินก่อน");
+                                    throw Exception("Log in First man");
 
                                   await PostService().createPost(
                                     authorId: currentUser.uid,
                                     message: text,
-                                    latitude: _myPosition!.latitude + 0.0001,
+                                    latitude: _myPosition!.latitude,
                                     longitude: _myPosition!.longitude,
                                   );
                                   if (mounted) {
                                     Navigator.pop(context); // ปิดหน้าต่าง
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text("ปล่อยผีสำเร็จ! 👻"),
+                                      SnackBar(
+                                        content: Text(l.createPostSuccess),
                                       ),
                                     );
                                   }
@@ -306,7 +305,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   setSheetState(() => isSubmitting = false);
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: Text("เกิดข้อผิดพลาด: $e"),
+                                      content: Text(l.errorOccurred(e.toString())),
                                     ),
                                   );
                                 }
@@ -321,8 +320,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                   strokeWidth: 2,
                                 ),
                               )
-                              : const Text(
-                                "ทิ้งข้อความ",
+                              : Text(
+                                l.createPostButton,
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 16,
@@ -357,6 +356,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = Provider.of<L>(context);
     final themeProvider = Provider.of<ThemeProvider>(context);
     final bool isDark = themeProvider.isDarkMode;
 
@@ -445,7 +445,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 SizedBox(width: 6),
                                 Text(
-                                  "Mode",
+                                  l.mapMode,
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
@@ -465,13 +465,36 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   if (!_isARMode)
                     Positioned(
+                      bottom: (MediaQuery.of(context).size.height / 8) + 90,
+                      right: MediaQuery.of(context).size.width / 15 + 10,
+                      child: SizedBox(
+                        height: 50,
+                        width: 50,
+                        child: FloatingActionButton(
+                          heroTag: "my_location_btn",
+                          backgroundColor: isDark ? ThemeProvider.buttonDark : Colors.white,
+                          elevation: 4,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                          onPressed: _goToMyLocation,
+                          child: Icon(
+                            Icons.my_location,
+                            size: 24,
+                            color: isDark ? ThemeProvider.textDark : Colors.blue,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                  if (!_isARMode)
+                    Positioned(
                       bottom: MediaQuery.of(context).size.height / 8,
                       right: MediaQuery.of(context).size.width / 15,
                       child: SizedBox(
                         height: 70,
                         width: 70,
                         child: FloatingActionButton(
-                          heroTag: "create_post_btn",
                           backgroundColor: Colors.black,
                           elevation: 4,
                           shape: RoundedRectangleBorder(

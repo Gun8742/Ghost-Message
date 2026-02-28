@@ -29,6 +29,7 @@ class L {
   String get email => lang == AppLang.th ? "อีเมล" : "Email";
   String get username => lang == AppLang.th ? "ชื่อผู้ใช้" : "Username";
   String get password => lang == AppLang.th ? "รหัสผ่าน" : "Password";
+  String get confirmPassword => lang == AppLang.th ? "ยืนยันรหัสผ่าน" : "Confirm Password";
   String get edit => lang == AppLang.th ? "แก้ไข" : "Edit";
 
   String get sectionAppearance => lang == AppLang.th ? "หน้าตาแอป" : "Appearance";
@@ -106,7 +107,6 @@ class L {
   String get leaderboardButton => lang == AppLang.th ? "ตารางอันดับ" : "Leaderboard";
 
   //HOme page
-
   String get postTitle => lang == AppLang.th ? "โพสต์" : "Post";
   String get replyHint => lang == AppLang.th ? "พิมพ์ตอบกลับ..." : "Reply something...";
   String get noReplyYet => lang == AppLang.th ? "ยังไม่มีคนตอบกลับ เป็นคนแรกสิ!" : "No one reply this be the first one";
@@ -114,4 +114,30 @@ class L {
   String get reportReasonHint => lang == AppLang.th ? "ใส่เหตุผลที่นี่..." : "Enter reason here...";
   String get submitReport => lang == AppLang.th ? "ส่งรายงาน" : "Submit Report";
   String get reportSuccess => lang == AppLang.th ? "ส่งรายงานเรียบร้อยแล้ว" : "Report submitted successfully.";
+  String get locationPermissionDenied => lang == AppLang.th ? "ไม่สามารถใช้งานตำแหน่งได้ กรุณาเปิด Location และ Permission" : "Location access denied. Please enable location permissions.";
+  
+  String get pleaseLoginFirst => lang == AppLang.th ? "กรุณาล็อกอินก่อนดูข้อความ" : "Please login to view messages";
+  
+  String distanceTooFar(String dist, String remain) => lang == AppLang.th ? " ไกลเกินไป! ต้องเข้าใกล้อีก $remain m" : "Too far!, Get $remain m closer to open";
+      
+  String get findingLocation => lang == AppLang.th ? "กำลังหาพิกัดของคุณ... รอก่อนนะ" : "Locating you... wait a minute who are u";
+
+  // Create Post Sheet
+  String get createPostTitle => lang == AppLang.th ? "ทิ้งข้อความไว้ที่นี่..." : "Drop a message here...";
+  
+  String get createPostHint => lang == AppLang.th ? "พิมพ์ข้อความของคุณ..." : "Type your message here...";
+  
+  String get createPostButton => lang == AppLang.th ? "ทิ้งข้อความ" : "Drop Message";
+      
+  String get createPostSuccess => lang == AppLang.th ? "สร้างโพสต์สำเร็จ!" : "Message dropped successfully! 👻";
+      
+  String errorOccurred(String error) => lang == AppLang.th ? "เกิดข้อผิดพลาด: $error" : "An error occurred: $error";
+      
+  String get mapMode => lang == AppLang.th ? "โหมด" : "Mode";
+
+  //Authorities
+  String get signIn => lang == AppLang.th ? "เข้าสู่ระบบ" : "Sign In"; 
+  String get signUp => lang == AppLang.th ? "สมัครสมาชิก" : "Sign Up"; 
+  String get noHaveAccount => lang == AppLang.th ? "ไม่มีบัญชีงั้นเหรอ กดเลยที่นี่!" : "Doesn't have an account? Sign Up"; 
+  String get haveAccount => lang == AppLang.th ? "มีบัญชีแล้วงั้นเหรอ ไปที่เข้าสู่ระบบ ตรงนี้!" : "Already have an account? Sign In"; 
 }
