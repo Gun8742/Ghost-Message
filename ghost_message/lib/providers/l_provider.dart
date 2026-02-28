@@ -98,4 +98,20 @@ class L {
   String get adminCleanRecord => lang == AppLang.th ? "ปกติ" : "Clean Record";
   String get adminReportedCountPrefix => lang == AppLang.th ? "มีผู้ใช้รายงาน " : "";
   String get adminReportedCountSuffix => lang == AppLang.th ? " คน" : " users reported this user";
+
+  // Leaderboard  
+  String get leaderboardTitle => lang == AppLang.th ? "อันดับ" : "Leaderboard";
+  String get leaderboardPostTab => lang == AppLang.th ? "จำนวนโพสต์" : "Posts";
+  String get leaderboardLikeTab => lang == AppLang.th ? "ไลก์" : "Likes";
+  String get leaderboardButton => lang == AppLang.th ? "ตารางอันดับ" : "Leaderboard";
+
+  //HOme page
+
+  String get postTitle => lang == AppLang.th ? "โพสต์" : "Post";
+  String get replyHint => lang == AppLang.th ? "พิมพ์ตอบกลับ..." : "Reply something...";
+  String get noReplyYet => lang == AppLang.th ? "ยังไม่มีคนตอบกลับ เป็นคนแรกสิ!" : "No one reply this be the first one";
+  String get reportReasonTitle => lang == AppLang.th ? "รายงานความไม่เหมาะสม" : "Report with reason";
+  String get reportReasonHint => lang == AppLang.th ? "ใส่เหตุผลที่นี่..." : "Enter reason here...";
+  String get submitReport => lang == AppLang.th ? "ส่งรายงาน" : "Submit Report";
+  String get reportSuccess => lang == AppLang.th ? "ส่งรายงานเรียบร้อยแล้ว" : "Report submitted successfully.";
 }

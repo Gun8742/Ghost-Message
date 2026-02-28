@@ -25,6 +25,7 @@ class UserFirestoreService {
     });
   }
 
+
   Future<void> updateTheme(String uid, bool isDark) async {
     try {
       await _instance.collection("users").doc(uid).update({

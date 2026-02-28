@@ -12,6 +12,10 @@ class UserModel {
   final DateTime createdAt;
   final DateTime lastActive;
   final int reportCount;
+  final List<String> likedPosts;
+  final List<String> likedReplies;
+  final bool isSuspended;
+
   UserModel ({
     required this.uid,
     required this.email,
@@ -23,7 +27,11 @@ class UserModel {
     this.language = "eng",
     required this.createdAt,
     required this.lastActive,
-    this.reportCount = 0
+    this.reportCount = 0,
+    this.likedPosts = const [],
+    this.likedReplies = const [],
+    this.isSuspended = false,
+    
   });
 
   factory UserModel.fromMap(String uid, Map<String, dynamic> data) {
@@ -39,22 +47,28 @@ class UserModel {
       createdAt: (data["created_at"] as Timestamp).toDate(),
       lastActive: (data["last_active"] as Timestamp).toDate(),
       reportCount: data["report_count"] ?? 0,
+      likedPosts: List<String>.from(data["liked_posts"] ?? []),
+      likedReplies: List<String>.from(data["liked_replies"] ?? []),
+      isSuspended: data["is_suspended"] ?? false,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'uid': uid,
-      'email': email,
-      'username': username,
-      'photo_path': photoPath,
-      'role': role,
-      'level': level,
-      'is_dark_mode': isDarkMode,
-      'language': language,
-      'created_at': Timestamp.fromDate(createdAt),
-      'last_active': FieldValue.serverTimestamp(),
-      'report_count' : reportCount,
+      "uid": uid,
+      "email": email,
+      "username": username,
+      "photo_path": photoPath,
+      "role": role,
+      "level": level,
+      "is_dark_mode": isDarkMode,
+      "language": language,
+      "created_at": Timestamp.fromDate(createdAt),
+      "last_active": FieldValue.serverTimestamp(),
+      "report_count" : reportCount,
+      "liked_posts": likedPosts,
+      "liked_replies": likedReplies,
+      "is_suspended": isSuspended,
     };
   }
 }

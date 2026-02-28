@@ -1,12 +1,16 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:ghost_message/providers/theme_provider.dart';
+import 'package:ghost_message/providers/user_provider.dart';
+import 'package:ghost_message/services/post_service.dart';
+import 'package:ghost_message/widgets/post_sheet.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:ghost_message/models/post_model.dart';
 import 'package:ghost_message/services/map_service.dart';
 import 'package:provider/provider.dart';
 import 'package:ghost_message/widgets/utility.dart';
-
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -27,7 +31,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Position? _myPosition;
 
-  List<PostModel> _mockPosts = [];
+  final PostService _postService = PostService();
+  StreamSubscription<List<PostModel>>? _postStreamSubscription;
+  List<PostModel> _realPosts = [];
   Set<Marker> _markerSet = {};
   Set<Circle> _circleSet = {};
 
@@ -43,7 +49,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _initMapSystem() async {
-    final bool isGranted = await _mapService.checkAndRequestLocationPermission();
+    final bool isGranted =
+        await _mapService.checkAndRequestLocationPermission();
 
     if (!isGranted) {
       if (!mounted) return;
@@ -54,7 +61,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("ไม่สามารถใช้งานตำแหน่งได้ กรุณาเปิด Location และ Permission"),
+          content: Text(
+            "ไม่สามารถใช้งานตำแหน่งได้ กรุณาเปิด Location และ Permission",
+          ),
         ),
       );
       return;
@@ -64,10 +73,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
     await _mapService.initMapIcons();
 
-    _mockPosts = _mapService.getMockPosts();
     _myPosition = currentPosition;
 
-    _rebuildMapData();
+    _postStreamSubscription = _postService.streamNearByPosts().listen((posts) {
+      if (!context.mounted) {
+        return;
+      }
+      setState(() {
+        _realPosts = posts;
+        _rebuildMapData();
+      });
+    });
 
     _mapService.startRealtimeLocation(
       onChanged: (Position position) {
@@ -78,7 +94,9 @@ class _HomeScreenState extends State<HomeScreen> {
           _rebuildMapData();
         });
 
-        if (_isFollowMyLocation && _isMapReady && _googleMapController != null) {
+        if (_isFollowMyLocation &&
+            _isMapReady &&
+            _googleMapController != null) {
           _googleMapController!.animateCamera(
             CameraUpdate.newLatLng(
               LatLng(position.latitude, position.longitude),
@@ -96,8 +114,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _rebuildMapData() {
-    final Set<Marker> postMarkers = _mapService.buildMockPostMarkers(
-      posts: _mockPosts,
+    final Set<Marker> postMarkers = _mapService.buildPostMarkers(
+      posts: _realPosts,
       onTapMarker: _onTapPostMarker,
     );
 
@@ -131,19 +149,24 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     if (canOpen) {
-      showGhostPostDialog(
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      final currentUser = userProvider.currentUser;
+      if (currentUser == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("กรุณาล็อกอินก่อนดูข้อความ 👻")),
+        );
+        return;
+      }
+      showModalBottomSheet(
         context: context,
-        authorName: "Name",
-        isAnonymous: true,
-        message: post.message,
-        onReport: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Report ส่งแล้ว (mock)"),
-              duration: Duration(seconds: 1),
-            ),
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) {
+          return PostSheet(
+            post: post,
+            currentUser: currentUser,
           );
-        },
+        }
       );
     } else {
       final double remain = distance - 20;
@@ -174,6 +197,150 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  void _showCreatePostSheet() {
+    if (_myPosition == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("กำลังหาพิกัดของคุณ... รอก่อนนะ 👻")),
+      );
+      return;
+    }
+    final TextEditingController messageController = TextEditingController();
+    bool isSubmitting = false;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            final themeProvider = Provider.of<ThemeProvider>(context);
+            final bool isDark = themeProvider.isDarkMode;
+            return Container(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+                left: 20,
+                right: 20,
+                top: 20,
+              ),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(20),
+                ),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "👻 ทิ้งข้อความผีไว้ที่นี่...",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+                  TextField(
+                    controller: messageController,
+                    maxLength: 200,
+                    maxLines: 4,
+                    style: TextStyle(
+                      color: isDark ? Colors.white : Colors.black,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: "พิมพ์ความลับของคุณ...",
+                      hintStyle: const TextStyle(color: Colors.grey),
+                      filled: true,
+                      fillColor: isDark ? Colors.black26 : Colors.grey[100],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blueAccent,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      onPressed:
+                          isSubmitting
+                              ? null
+                              : () async {
+                                final text = messageController.text.trim();
+                                if (text.isEmpty) return;
+                                setSheetState(() => isSubmitting = true);
+                                try {
+                                  final userProvider =
+                                      Provider.of<UserProvider>(
+                                        context,
+                                        listen: false,
+                                      );
+                                  final currentUser = userProvider.currentUser;
+                                  if (currentUser == null)
+                                    throw Exception("กรุณาล็อกอินก่อน");
+
+                                  await PostService().createPost(
+                                    authorId: currentUser.uid,
+                                    message: text,
+                                    latitude: _myPosition!.latitude + 0.0001,
+                                    longitude: _myPosition!.longitude,
+                                  );
+                                  if (mounted) {
+                                    Navigator.pop(context); // ปิดหน้าต่าง
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text("ปล่อยผีสำเร็จ! 👻"),
+                                      ),
+                                    );
+                                  }
+                                } catch (e) {
+                                  setSheetState(() => isSubmitting = false);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text("เกิดข้อผิดพลาด: $e"),
+                                    ),
+                                  );
+                                }
+                              },
+                      child:
+                          isSubmitting
+                              ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                              : const Text(
+                                "ทิ้งข้อความ",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   void _onTapModeButton() {
     setState(() {
       _isARMode = !_isARMode;
@@ -182,6 +349,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
+    _postStreamSubscription?.cancel();
     _mapService.dispose();
     _googleMapController?.dispose();
     super.dispose();
@@ -193,95 +361,133 @@ class _HomeScreenState extends State<HomeScreen> {
     final bool isDark = themeProvider.isDarkMode;
 
     return Scaffold(
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Stack(
-              children: [
-                _isARMode
-                  ? Container(
-                      color: isDark ? ThemeProvider.bgDark : ThemeProvider.bgLight,
-                      child: const Center(
-                        child: Text(
-                          "AR MODE",
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    )
-                  : GoogleMap(
-                      initialCameraPosition: _defaultCameraPosition,
-                      markers: _markerSet,
-                      circles: _circleSet,
-                      myLocationEnabled: false,
-                      myLocationButtonEnabled: false,
-                      zoomControlsEnabled: false,
-                      compassEnabled: true,
-                      onMapCreated: (GoogleMapController controller) async {
-                        _googleMapController = controller;
-                        _isMapReady = true;
-
-                        if (_myPosition != null) {
-                          await controller.animateCamera(
-                            CameraUpdate.newCameraPosition(
-                              CameraPosition(
-                                target: LatLng(_myPosition!.latitude, _myPosition!.longitude),
-                                zoom: 18,
-                              ),
+      body:
+          _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : Stack(
+                children: [
+                  _isARMode
+                      ? Container(
+                        color:
+                            isDark
+                                ? ThemeProvider.bgDark
+                                : ThemeProvider.bgLight,
+                        child: const Center(
+                          child: Text(
+                            "AR MODE",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
                             ),
-                          );
-                        }
-                      },
-                      onCameraMoveStarted: () {
-                        _isFollowMyLocation = false;
-                      },
-                    ),
+                          ),
+                        ),
+                      )
+                      : GoogleMap(
+                        initialCameraPosition: _defaultCameraPosition,
+                        markers: _markerSet,
+                        circles: _circleSet,
+                        myLocationEnabled: false,
+                        myLocationButtonEnabled: false,
+                        zoomControlsEnabled: false,
+                        compassEnabled: true,
+                        onMapCreated: (GoogleMapController controller) async {
+                          _googleMapController = controller;
+                          _isMapReady = true;
 
-                Positioned(
-                  top: 55,
-                  right: 12,
-                  child: SafeArea(
-                    child: Material(
-                      color: isDark ? ThemeProvider.buttonDark : ThemeProvider.buttonLight,
-                      borderRadius: BorderRadius.circular(20),
-                      elevation: 3,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(20),
-                        onTap: _onTapModeButton,
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.layers_outlined, size: 18, color: isDark ? ThemeProvider.textDark : ThemeProvider.textLight),
-                              SizedBox(width: 6),
-                              Text(
-                                "Mode",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  color: isDark ? ThemeProvider.textDark : ThemeProvider.textLight,
+                          if (_myPosition != null) {
+                            await controller.animateCamera(
+                              CameraUpdate.newCameraPosition(
+                                CameraPosition(
+                                  target: LatLng(
+                                    _myPosition!.latitude,
+                                    _myPosition!.longitude,
+                                  ),
+                                  zoom: 18,
                                 ),
                               ),
-                            ],
+                            );
+                          }
+                        },
+                        onCameraMoveStarted: () {
+                          _isFollowMyLocation = false;
+                        },
+                      ),
+
+                  Positioned(
+                    top: 55,
+                    right: 12,
+                    child: SafeArea(
+                      child: Material(
+                        color:
+                            isDark
+                                ? ThemeProvider.buttonDark
+                                : ThemeProvider.buttonLight,
+                        borderRadius: BorderRadius.circular(20),
+                        elevation: 3,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(20),
+                          onTap: _onTapModeButton,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 10,
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.layers_outlined,
+                                  size: 18,
+                                  color:
+                                      isDark
+                                          ? ThemeProvider.textDark
+                                          : ThemeProvider.textLight,
+                                ),
+                                SizedBox(width: 6),
+                                Text(
+                                  "Mode",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color:
+                                        isDark
+                                            ? ThemeProvider.textDark
+                                            : ThemeProvider.textLight,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
 
-                if (!_isARMode)
-                  Positioned(
-                    right: 12,
-                    bottom: 90,
-                    child: FloatingActionButton(
-                      heroTag: "my_location_btn",
-                      mini: true,
-                      onPressed: _goToMyLocation,
-                      child: const Icon(Icons.my_location),
+                  if (!_isARMode)
+                    Positioned(
+                      bottom: MediaQuery.of(context).size.height / 8,
+                      right: MediaQuery.of(context).size.width / 15,
+                      child: SizedBox(
+                        height: 70,
+                        width: 70,
+                        child: FloatingActionButton(
+                          heroTag: "create_post_btn",
+                          backgroundColor: Colors.black,
+                          elevation: 4,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(35),
+                          ),
+                          onPressed: _showCreatePostSheet,
+                          child: const Icon(
+                            Icons.add,
+                            size: 35,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-              ],
-            ),
+                ],
+              ),
     );
   }
 }
