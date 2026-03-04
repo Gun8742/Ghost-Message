@@ -1,6 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-enum ReportType { user, message }
+enum ReportType { 
+  user,
+  message,
+  reply
+}
 
 class ReportModel {
   final String id; 
@@ -36,7 +40,7 @@ class ReportModel {
     return ReportModel(
       id : documentId,
       type: ReportType.values.firstWhere(
-        (e) => e.name == map["type"],
+        (e) => e.name == map["report_type"],
         orElse: () => ReportType.user,
       ),
       targetId: map["target_id"] ?? "",

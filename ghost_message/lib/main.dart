@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:ghost_message/providers/admin_provider.dart';
 import 'package:ghost_message/providers/navigation_provider.dart';
 import 'package:ghost_message/providers/language_provider.dart';
 import 'package:ghost_message/providers/l_provider.dart';
+import 'package:ghost_message/providers/report_provider.dart';
 import 'package:ghost_message/providers/theme_provider.dart';
 import 'package:ghost_message/providers/user_provider.dart';
 import 'package:ghost_message/screens/admin/admin_dashboard.dart';
@@ -20,6 +22,8 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (context) => AdminProvider()),
+        ChangeNotifierProvider(create: (_) => ReportProvider()),
         ChangeNotifierProvider(create: (context) => NavigationProvider()),
         ChangeNotifierProvider(create: (context) => UserProvider()..initUser()),
         ChangeNotifierProxyProvider<UserProvider, LanguageProvider>(

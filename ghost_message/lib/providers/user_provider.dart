@@ -47,10 +47,10 @@ class UserProvider extends ChangeNotifier {
     }
   }
   
-  void initUser() {
+  Future<void> initUser() async {
     _userSubscription = _userFirestoreService.getUsers().listen((users) {
     _allUsers = users;
-
+    
     // final authUser = FirebaseAuth.instance.currentUser;
     // if (authUser != null) {
     //   final bool userExists = users.any((u) => u.uid == authUser.uid);
@@ -64,6 +64,11 @@ class UserProvider extends ChangeNotifier {
     // }
     notifyListeners();
     });
+
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      await _userFirestoreService.updateLastActive(currentUser.uid);
+    }
   }
 
   @override

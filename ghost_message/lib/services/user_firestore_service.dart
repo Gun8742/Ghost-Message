@@ -99,6 +99,16 @@ class UserFirestoreService {
       rethrow;
     }
   }
+
+  Future<void> updateLastActive(String uid) async {
+    try {
+      await _instance.collection('users').doc(uid).update({
+        'last_active': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      print("Error updating last active: $e");
+    }
+  }
   
   Future<void> setupInitialUser({
     required String uid, 

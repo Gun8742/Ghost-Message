@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:ghost_message/models/achievement_model.dart';
-import 'package:ghost_message/services/achievement_firestore_service.dart';
 import 'package:ghost_message/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -86,18 +85,18 @@ Widget buildAchievement(BuildContext context, AchievementModel item, String uid)
             ),
           ),
 
-          if (!item.isCompleted)
-            IconButton(
-              icon: Icon(Icons.add_circle_outline, color: isDark ? ThemeProvider.textDark : Colors.blueAccent),
-              onPressed: () {
-                AchievementFirestoreService().updateProgress(
-                  uid,
-                  item.id,
-                  item.currentValue + 1,
-                  item.targetValue,
-                );
-              },
-            ),
+          // if (!item.isCompleted)
+          //   IconButton(
+          //     icon: Icon(Icons.add_circle_outline, color: isDark ? ThemeProvider.textDark : Colors.blueAccent),
+          //     onPressed: () {
+          //       AchievementFirestoreService().updateProgress(
+          //         uid,
+          //         item.id,
+          //         item.currentValue + 1,
+          //         item.targetValue,
+          //       );
+          //     },
+          //   ),
         ],
       ),
     ),

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ghost_message/models/post_model.dart';
+import 'package:ghost_message/services/achievement_firestore_service.dart';
 
 class PostService {
   final FirebaseFirestore _instance = FirebaseFirestore.instance;
@@ -20,8 +21,17 @@ class PostService {
       longitude: longitude,
       createdAt: DateTime.now(),
     );
-    await reference.set(newPost.toMap());
+ 
+   await reference.set(newPost.toMap());
+   await AchievementFirestoreService().incrementProgress(
+        uid: authorId, 
+        type: "QUEST_SEND_MSG"
+      );
   }
+  Future<void> deletePost(String postId) async {
+    await _instance.collection('posts').doc(postId).delete();
+  }
+
 
   Stream<List<PostModel>> streamNearByPosts() {
     return _instance.collection("posts")

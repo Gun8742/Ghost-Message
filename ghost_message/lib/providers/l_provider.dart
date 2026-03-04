@@ -99,6 +99,29 @@ class L {
   String get adminCleanRecord => lang == AppLang.th ? "ปกติ" : "Clean Record";
   String get adminReportedCountPrefix => lang == AppLang.th ? "มีผู้ใช้รายงาน " : "";
   String get adminReportedCountSuffix => lang == AppLang.th ? " คน" : " users reported this user";
+  String get unbannedUserSuccessfully => lang == AppLang.th ? "ปลดแบนแล้ว" : "Unbanned this user";
+  String get bannedUserSuccessfully => lang == AppLang.th ? "แบนเรียบร้อย" : "Banned this user";
+  String get ban=> lang == AppLang.th ? "ระงับบัญชี" : "Ban";
+  String get unban => lang == AppLang.th ? "ยกเลิกการระงับบัญชี" : "Unban";
+  String get adminClose => lang == AppLang.th ? "ปิด" : "Close";
+  String get adminDelete => lang == AppLang.th ? "ลบ" : "Delete";
+  String get adminDeleted => lang == AppLang.th ? "ลบเรียบร้อย" : "Deleted";
+  String get adminReportDetail => lang == AppLang.th ? "รายละเอียดรายงาน" : "Report Detail";
+  String get adminReportReason => lang == AppLang.th ? "เหตุผล" : "Reason";
+  String get adminReportType => lang == AppLang.th ? "ประเภท" : "Type";
+  String get adminTargetId => lang == AppLang.th ? "ID เป้าหมาย" : "Target ID";
+  String get adminAccountInfo => lang == AppLang.th ? "ข้อมูลบัญชี" : "Account Info";
+  String get adminActivityStats => lang == AppLang.th ? "กิจกรรม & สถิติ" : "Activity & Stats";
+  String get adminLikesGiven => lang == AppLang.th ? "ถูกใจผู้อื่น" : "Likes Given";
+  String get adminJoined => lang == AppLang.th ? "วันที่สมัคร" : "Created";
+
+  String get adminAckKeep => lang == AppLang.th ? "รับทราบ" : "Acknowledge";
+  String get adminDeleteContent => lang == AppLang.th ? "ลบเนื้อหา" : "Delete Content";
+  String get adminBanUser => lang == AppLang.th ? "แบนผู้ใช้" : "Ban User";
+
+  String get adminMsgAckKeep => lang == AppLang.th ? "รับทราบ: เก็บเนื้อหาไว้" : "Acknowledged: Content kept";
+  String get adminMsgDeleteSuccess => lang == AppLang.th ? "จัดการเรียบร้อย (ลบเนื้อหา + ลบรายงาน)" : "Success (Content deleted + Report deleted)";
+  String get adminMsgBanSuccess => lang == AppLang.th ? "แบนผู้ใช้เรียบร้อย" : "User banned successfully";
 
   // Leaderboard  
   String get leaderboardTitle => lang == AppLang.th ? "อันดับ" : "Leaderboard";
@@ -121,7 +144,7 @@ class L {
   String distanceTooFar(String dist, String remain) => lang == AppLang.th ? " ไกลเกินไป! ต้องเข้าใกล้อีก $remain m" : "Too far!, Get $remain m closer to open";
       
   String get findingLocation => lang == AppLang.th ? "กำลังหาพิกัดของคุณ... รอก่อนนะ" : "Locating you... wait a minute who are u";
-
+  
   // Create Post Sheet
   String get createPostTitle => lang == AppLang.th ? "ทิ้งข้อความไว้ที่นี่..." : "Drop a message here...";
   
@@ -134,10 +157,19 @@ class L {
   String errorOccurred(String error) => lang == AppLang.th ? "เกิดข้อผิดพลาด: $error" : "An error occurred: $error";
       
   String get mapMode => lang == AppLang.th ? "โหมด" : "Mode";
+  String get reportPost => lang == AppLang.th ? "รายงานโพสต์นี้" : "Report this post.";
+  String get reportUser => lang == AppLang.th ? "รายงานผู้ใช้" : "Report this user.";
+  String get reportReply => lang == AppLang.th ? "รายงานการตอบกลับ" : "Report this reply.";
+  String get reportReplyWithReason => lang == AppLang.th ? "รายงานด้วยเหตุผล (ตอบกลับ)" : "Report Reason (reply)";
+  String get reportPostWithReason => lang == AppLang.th ? "รายงานด้วยเหตุผล (โพสต์)" : "Report Reason (post)";
+  String get reportUserWithReason => lang == AppLang.th ? "รายงานด้วยเหตุผล (ผู้ใช้)" : "Report Reason (user)";
+
 
   //Authorities
   String get signIn => lang == AppLang.th ? "เข้าสู่ระบบ" : "Sign In"; 
   String get signUp => lang == AppLang.th ? "สมัครสมาชิก" : "Sign Up"; 
   String get noHaveAccount => lang == AppLang.th ? "ไม่มีบัญชีงั้นเหรอ กดเลยที่นี่!" : "Doesn't have an account? Sign Up"; 
   String get haveAccount => lang == AppLang.th ? "มีบัญชีแล้วงั้นเหรอ ไปที่เข้าสู่ระบบ ตรงนี้!" : "Already have an account? Sign In"; 
+  String get accountSuspended => lang == AppLang.th ? "บัญชีของคุณถูกระงับการใช้งาน กรุณาติดต่อแอดมิน" : "Your account has been suspended. Please contact admin.";
+  String get signInFailed => lang == AppLang.th ? "ไม่สามารถเข้าสู่ระบบได้" : "Sign in Failed";
 }

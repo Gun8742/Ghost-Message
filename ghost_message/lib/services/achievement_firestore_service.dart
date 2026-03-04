@@ -38,6 +38,61 @@ class AchievementFirestoreService {
     });
   }
 
+  Future<void> incrementProgress({
+    required uid,
+    required type,
+    double amount = 1,
+  }) async {
+    final reference = _instance.collection("users").doc(uid).collection("achievements");
+
+    final snapshot = await reference.where("type", isEqualTo: type).where("is_completed", isEqualTo: false).get();
+    final batch = _instance.batch();
+
+    for (var doc in snapshot.docs) {
+      final data = doc.data();
+      double current = (data["current_value"] ?? 0).toDouble();
+      double target = (data["target_value"] ?? 1).toDouble();
+      double newValue = current + amount;
+      bool isFinished = newValue >= target;
+
+      batch.update(doc.reference, {
+        "current_value": newValue,
+        "is_completed": isFinished,
+      });
+    }
+    
+    if (snapshot.docs.isNotEmpty) {
+      await batch.commit();
+    }
+  }
+  Future<void> decrementProgress({
+    required uid,
+    required type,
+    double amount = -1,
+  }) async {
+    final reference = _instance.collection("users").doc(uid).collection("achievements");
+
+    final snapshot = await reference.where("type", isEqualTo: type).where("is_completed", isEqualTo: false).get();
+    final batch = _instance.batch();
+
+    for (var doc in snapshot.docs) {
+      final data = doc.data();
+      double current = (data["current_value"] ?? 0).toDouble();
+      double target = (data["target_value"] ?? 1).toDouble();
+      double newValue = current + amount;
+      bool isFinished = newValue >= target;
+
+      batch.update(doc.reference, {
+        "current_value": newValue,
+        "is_completed": isFinished,
+      });
+    }
+    
+    if (snapshot.docs.isNotEmpty) {
+      await batch.commit();
+    }
+  }
+
   
   Future<void> setupInitialAchievement(String uid) async {
     final collectionReference = _instance.collection("users").doc(uid).collection("achievements");
@@ -45,6 +100,7 @@ class AchievementFirestoreService {
       {
         "sequence" : 1,
         "title": "Welcome Ghost",
+        "type": "QUEST_SEND_MSG",
         "description": "เริ่มต้นการเดินทางใน Ghost Message",
         "current_value": 0,
         "target_value": 1,
@@ -53,6 +109,7 @@ class AchievementFirestoreService {
       {
         "sequence" : 2,
         "title": "Social Phantom",
+        "type": "QUEST_SEND_MSG",
         "description": "ส่งข้อความครบ 5 ครั้ง",
         "current_value": 0,
         "target_value": 5,
@@ -61,6 +118,7 @@ class AchievementFirestoreService {
       {
         "sequence" : 3,
         "title": "Social Monster",
+        "type": "QUEST_SEND_MSG",
         "description": "ส่งข้อความครบ 50 ครั้ง",
         "current_value": 0,
         "target_value": 50,
@@ -69,6 +127,7 @@ class AchievementFirestoreService {
       {
         "sequence" : 4,
         "title": "Social Lord",
+        "type": "QUEST_SEND_MSG",
         "description": "ส่งข้อความครบ 200 ครั้ง",
         "current_value": 0,
         "target_value": 250,
@@ -77,7 +136,53 @@ class AchievementFirestoreService {
       {
         "sequence" : 5,
         "title": "Social Emperor",
+        "type": "QUEST_SEND_MSG",
         "description": "ส่งข้อความครบ 1000 ครั้ง",
+        "current_value": 0,
+        "target_value": 1000,
+        "is_completed": false,
+      },
+      {
+        "sequence" : 6,
+        "title": "First like?",
+        "type": "QUEST_GET_LIKE",
+        "description": "ได้รับ Like ครบ 1 ครั้ง",
+        "current_value": 0,
+        "target_value": 1,
+        "is_completed": false,
+      },
+      {
+        "sequence" : 7,
+        "title": "Popular Ghost",
+        "type": "QUEST_GET_LIKE",
+        "description": "ได้รับ Like ครบ 10 ครั้ง",
+        "current_value": 0,
+        "target_value": 10,
+        "is_completed": false,
+      },
+      {
+        "sequence" : 8,
+        "title": "Celebrity Ghost",
+        "type": "QUEST_GET_LIKE",
+        "description": "ได้รับ Like ครบ 100 ครั้ง",
+        "current_value": 0,
+        "target_value": 100,
+        "is_completed": false,
+      },
+      {
+        "sequence" : 9,
+        "title": "Influencer Ghost",
+        "type": "QUEST_GET_LIKE",
+        "description": "ได้รับ Like ครบ 500 ครั้ง",
+        "current_value": 0,
+        "target_value": 500,
+        "is_completed": false,
+      },
+      {
+        "sequence" : 10,
+        "title": "No one don't know this guy",
+        "type": "QUEST_GET_LIKE",
+        "description": "ได้รับ Like ครบ 1000 ครั้ง",
         "current_value": 0,
         "target_value": 1000,
         "is_completed": false,

@@ -28,7 +28,6 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isLoading = true;
   bool _isMapReady = false;
   bool _isFollowMyLocation = true;
-  bool _isARMode = false;
 
   Position? _myPosition;
 
@@ -61,9 +60,9 @@ class _HomeScreenState extends State<HomeScreen> {
       });
 
       final l = Provider.of<L>(context, listen: false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l.locationPermissionDenied)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l.locationPermissionDenied)));
       return;
     }
 
@@ -151,9 +150,9 @@ class _HomeScreenState extends State<HomeScreen> {
       final currentUser = userProvider.currentUser;
       final l = Provider.of<L>(context, listen: false);
       if (currentUser == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l.pleaseLoginFirst)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l.pleaseLoginFirst)));
         return;
       }
       showModalBottomSheet(
@@ -161,11 +160,8 @@ class _HomeScreenState extends State<HomeScreen> {
         isScrollControlled: true,
         backgroundColor: Colors.transparent,
         builder: (context) {
-          return PostSheet(
-            post: post,
-            currentUser: currentUser,
-          );
-        }
+          return PostSheet(post: post, currentUser: currentUser);
+        },
       );
     } else {
       final double remain = distance - 20;
@@ -173,7 +169,12 @@ class _HomeScreenState extends State<HomeScreen> {
       final l = Provider.of<L>(context, listen: false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(l.distanceTooFar(distance.toStringAsFixed(1), remain.toStringAsFixed(1))),
+          content: Text(
+            l.distanceTooFar(
+              distance.toStringAsFixed(1),
+              remain.toStringAsFixed(1),
+            ),
+          ),
           duration: const Duration(seconds: 2),
         ),
       );
@@ -198,9 +199,9 @@ class _HomeScreenState extends State<HomeScreen> {
   void _showCreatePostSheet() {
     final l = Provider.of<L>(context, listen: false);
     if (_myPosition == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l.findingLocation)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l.findingLocation)));
       return;
     }
     final TextEditingController messageController = TextEditingController();
@@ -305,7 +306,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                   setSheetState(() => isSubmitting = false);
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: Text(l.errorOccurred(e.toString())),
+                                      content: Text(
+                                        l.errorOccurred(e.toString()),
+                                      ),
                                     ),
                                   );
                                 }
@@ -340,12 +343,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _onTapModeButton() {
-    setState(() {
-      _isARMode = !_isARMode;
-    });
-  }
-
   @override
   void dispose() {
     _postStreamSubscription?.cancel();
@@ -366,172 +363,82 @@ class _HomeScreenState extends State<HomeScreen> {
               ? const Center(child: CircularProgressIndicator())
               : Stack(
                 children: [
-                  _isARMode
-                      ? Container(
-                        color:
-                            isDark
-                                ? ThemeProvider.bgDark
-                                : ThemeProvider.bgLight,
-                        child: const Center(
-                          child: Text(
-                            "AR MODE",
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      )
-                      : GoogleMap(
-                        initialCameraPosition: _defaultCameraPosition,
-                        markers: _markerSet,
-                        circles: _circleSet,
-                        myLocationEnabled: false,
-                        myLocationButtonEnabled: false,
-                        zoomControlsEnabled: false,
-                        compassEnabled: true,
-                        onMapCreated: (GoogleMapController controller) async {
-                          _googleMapController = controller;
-                          _isMapReady = true;
+                  GoogleMap(
+                    initialCameraPosition: _defaultCameraPosition,
+                    markers: _markerSet,
+                    circles: _circleSet,
+                    myLocationEnabled: false,
+                    myLocationButtonEnabled: false,
+                    zoomControlsEnabled: false,
+                    compassEnabled: true,
+                    onMapCreated: (GoogleMapController controller) async {
+                      _googleMapController = controller;
+                      _isMapReady = true;
 
-                          if (_myPosition != null) {
-                            await controller.animateCamera(
-                              CameraUpdate.newCameraPosition(
-                                CameraPosition(
-                                  target: LatLng(
-                                    _myPosition!.latitude,
-                                    _myPosition!.longitude,
-                                  ),
-                                  zoom: 18,
-                                ),
+                      if (_myPosition != null) {
+                        await controller.animateCamera(
+                          CameraUpdate.newCameraPosition(
+                            CameraPosition(
+                              target: LatLng(
+                                _myPosition!.latitude,
+                                _myPosition!.longitude,
                               ),
-                            );
-                          }
-                        },
-                        onCameraMoveStarted: () {
-                          _isFollowMyLocation = false;
-                        },
-                      ),
-
-                  Positioned(
-                    top: 55,
-                    right: 12,
-                    child: SafeArea(
-                      child: Material(
-                        color:
-                            isDark
-                                ? ThemeProvider.buttonDark
-                                : ThemeProvider.buttonLight,
-                        borderRadius: BorderRadius.circular(20),
-                        elevation: 3,
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(20),
-                          onTap: _onTapModeButton,
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 10,
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Icons.layers_outlined,
-                                  size: 18,
-                                  color:
-                                      isDark
-                                          ? ThemeProvider.textDark
-                                          : ThemeProvider.textLight,
-                                ),
-                                SizedBox(width: 6),
-                                Text(
-                                  l.mapMode,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color:
-                                        isDark
-                                            ? ThemeProvider.textDark
-                                            : ThemeProvider.textLight,
-                                  ),
-                                ),
-                              ],
+                              zoom: 18,
                             ),
                           ),
+                        );
+                      }
+                    },
+                    onCameraMoveStarted: () {
+                      _isFollowMyLocation = false;
+                    },
+                  ),
+                  Positioned(
+                    bottom: (MediaQuery.of(context).size.height / 8) + 90,
+                    right: MediaQuery.of(context).size.width / 15 + 10,
+                    child: SizedBox(
+                      height: 50,
+                      width: 50,
+                      child: FloatingActionButton(
+                        heroTag: "my_location_btn",
+                        backgroundColor:
+                            isDark ? ThemeProvider.buttonDark : Colors.white,
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                        onPressed: _goToMyLocation,
+                        child: Icon(
+                          Icons.my_location,
+                          size: 24,
+                          color: isDark ? ThemeProvider.textDark : Colors.blue,
                         ),
                       ),
                     ),
                   ),
-
-                  if (!_isARMode)
-                    Positioned(
-                      bottom: (MediaQuery.of(context).size.height / 8) + 90,
-                      right: MediaQuery.of(context).size.width / 15 + 10,
-                      child: SizedBox(
-                        height: 50,
-                        width: 50,
-                        child: FloatingActionButton(
-                          heroTag: "my_location_btn",
-                          backgroundColor: isDark ? ThemeProvider.buttonDark : Colors.white,
-                          elevation: 4,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                          onPressed: _goToMyLocation,
-                          child: Icon(
-                            Icons.my_location,
-                            size: 24,
-                            color: isDark ? ThemeProvider.textDark : Colors.blue,
-                          ),
+                  Positioned(
+                    bottom: MediaQuery.of(context).size.height / 8,
+                    right: MediaQuery.of(context).size.width / 15,
+                    child: SizedBox(
+                      height: 70,
+                      width: 70,
+                      child: FloatingActionButton(
+                        backgroundColor: Colors.black,
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(35),
+                        ),
+                        onPressed: _showCreatePostSheet,
+                        child: const Icon(
+                          Icons.add,
+                          size: 35,
+                          color: Colors.white,
                         ),
                       ),
                     ),
-
-                  if (!_isARMode)
-                    Positioned(
-                      bottom: MediaQuery.of(context).size.height / 8,
-                      right: MediaQuery.of(context).size.width / 15,
-                      child: SizedBox(
-                        height: 70,
-                        width: 70,
-                        child: FloatingActionButton(
-                          backgroundColor: Colors.black,
-                          elevation: 4,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(35),
-                          ),
-                          onPressed: _showCreatePostSheet,
-                          child: const Icon(
-                            Icons.add,
-                            size: 35,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
+                  ),
                 ],
               ),
     );
   }
 }
-
-// Widget _buildAR() {
-//   return Stack(
-//     // children: [
-//     //   ArCoreView(
-//     //     onArCoreViewCreated: _arService.onArCoreViewCreated,
-//     //     enableTapRecognizer: true,
-//     //     // onPlaneTap: _arService.onPlaneTap,
-//     //   ),
-//     //   Positioned(
-//     //     top: 12,
-//     //     left: 12,
-//     //     child: ElevatedButton.icon(
-//     //       onPressed: _exitAR,
-//     //       icon: const Icon(Icons.arrow_back),
-//     //       label: const Text('กลับ'),
-//     //     ),
-//     //   ),
-//     // ],
-//   );
-// }

@@ -3,7 +3,8 @@ import 'package:ghost_message/models/report_model.dart';
 
 enum ReportType {
   user,
-  message
+  message,
+  reply
 }
 
 class ReportFirestoreService {
@@ -14,6 +15,7 @@ class ReportFirestoreService {
     required String targetId,
     required String reportedByUid,
     required String reason,
+    String? parentId
   }) async {
     final batch = _instance.batch();
     final reference = _instance.collection("reports").doc();
@@ -36,6 +38,12 @@ class ReportFirestoreService {
       final messageRef = _instance.collection("posts").doc(targetId);
       batch.update(messageRef, {
         "report_count": FieldValue.increment(1),
+      });
+    }
+    else if (type == ReportType.reply) {
+      final messageRef = _instance.collection("posts").doc(parentId).collection("replies").doc(targetId);
+      batch.update(messageRef, {
+        "report_reply_count": FieldValue.increment(1),
       });
     }
 
@@ -66,5 +74,25 @@ class ReportFirestoreService {
         return ReportModel.fromMap(doc.id, data);
       }).toList();
     });
+  }
+
+  Future<void> markAsChecked(String reportId) async {
+    try {
+      await _instance.collection("reports").doc(reportId).update({
+        "is_checked": true,
+      });
+    } catch (e) {
+      print("Mark Checked Error: $e");
+      rethrow;
+    }
+  }
+  
+  Future<void> deleteReport(String reportId) async {
+    try {
+      await _instance.collection("reports").doc(reportId).delete();
+    } catch (e) {
+      print("Delete Report Error: $e");
+      rethrow;
+    }
   }
 }

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 Widget buildSearchTextField({
   required TextEditingController searchController,
-  required VoidCallback onFilterTap,
 
   String hintText = "Search",
   String filterText = "Filter",
@@ -39,28 +38,6 @@ Widget buildSearchTextField({
         ),
       ),
       const SizedBox(width: 10),
-      GestureDetector(
-        onTap: onFilterTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-          decoration: BoxDecoration(
-            color: filterBgColor ?? Colors.black,
-            borderRadius: BorderRadius.circular(30),
-          ),
-          child: Row(
-            children: [
-              Text(
-                filterText,
-                style: TextStyle(
-                  color: filterTextColor ?? Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Icon(Icons.keyboard_arrow_down, color: filterTextColor ?? Colors.white),
-            ],
-          ),
-        ),
-      ),
     ],
   );
 }

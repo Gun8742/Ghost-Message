@@ -24,9 +24,10 @@ class _SignInPageState extends State<SignInPage> {
   void _loginValidation() async {
     final _themeProvider = Provider.of<ThemeProvider>(context, listen: false);
     final _userProvider = Provider.of<UserProvider>(context, listen: false);
-    
+    final l = Provider.of<L>(context, listen: false);
+
     if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please fill all fields")));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l.fulfillTheBox)));
       return;
     }
     setState(() {
@@ -39,10 +40,23 @@ class _SignInPageState extends State<SignInPage> {
         password: _passwordController.text.trim()
       );
       if (user != null) {
-        if (context.mounted) {
-          _themeProvider.updateTheme(_userProvider.currentUser!.isDarkMode);
-          Navigator.pushNamedAndRemoveUntil(context, "/main-wrapper", (route) => false);
+        if (!_userProvider.currentUser!.isSuspended) {
+          if (context.mounted) {
+            _themeProvider.updateTheme(_userProvider.currentUser!.isDarkMode);
+            Navigator.pushNamedAndRemoveUntil(context, "/main-wrapper", (route) => false);
+          }
         }
+        else {
+          await _authService.signOut();
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l.accountSuspended)));
+        }
+      }
+      else {
+         if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(l.signInFailed))
+            );
+         }
       }
     }
     catch(e) {

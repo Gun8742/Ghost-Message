@@ -44,8 +44,12 @@ class UserModel {
       level: data["level"] ?? 1,
       isDarkMode: data["is_dark_mode"] ?? false,
       language: data["language"] ?? "eng",
-      createdAt: (data["created_at"] as Timestamp).toDate(),
-      lastActive: (data["last_active"] as Timestamp).toDate(),
+      createdAt: data["created_at"] != null 
+          ? (data["created_at"] as Timestamp).toDate() 
+          : DateTime.now(),
+      lastActive: data['last_active'] != null 
+          ? (data['last_active'] as Timestamp).toDate() 
+          : DateTime.now(),
       reportCount: data["report_count"] ?? 0,
       likedPosts: List<String>.from(data["liked_posts"] ?? []),
       likedReplies: List<String>.from(data["liked_replies"] ?? []),

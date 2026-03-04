@@ -54,6 +54,7 @@ class _PostSheetState extends State<PostSheet> {
       try {
         await _socialService.toggleLike(
           postId: widget.post.postId,
+          postOwnerId: widget.post.authorId,
           userId: widget.currentUser.uid,
           isCurrentlyLiked: !_isLiked,
         );
@@ -80,16 +81,27 @@ class _PostSheetState extends State<PostSheet> {
         print(e);
       }
     }
-    void _showReportDialog(String targetId) {
+    void _showReportDialog(String targetId, ReportType type) {
       final TextEditingController reasonController = TextEditingController();
+      
       showDialog(
         context: context,
         builder: (context) {
           final l = Provider.of<L>(context, listen: false);
+          String title = l.reportReasonTitle;
+          if (type == ReportType.user) {
+            title = l.reportUserWithReason;
+          } 
+          else if (type == ReportType.message) {
+            title = l.reportPostWithReason;
+          }
+          else if (type == ReportType.reply) {
+            title = l.reportReplyWithReason;
+          }
           final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
           return AlertDialog(
             backgroundColor: themeProvider.currentBgColor,
-            title: Text(l.reportReasonTitle),
+            title: Text(title),
             content: TextField(
               controller: reasonController,
               decoration: InputDecoration(
@@ -113,10 +125,11 @@ class _PostSheetState extends State<PostSheet> {
                   Navigator.pop(context);
                   try {
                     await ReportFirestoreService().submitToReport(
-                      type: ReportType.message,
+                      type: type,
                       targetId: targetId,
                       reportedByUid: widget.currentUser.uid,
                       reason: reason,
+                      parentId: widget.post.postId,
                     );
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -166,13 +179,39 @@ class _PostSheetState extends State<PostSheet> {
                   )
                 ),
                 
-                IconButton(
-                  icon: const Icon(
-                    Icons.flag_outlined,
-                    color: Colors.redAccent
-                  ),
-                  onPressed: () {
-                    _showReportDialog(widget.post.postId);
+                PopupMenuButton<String>(
+                  icon: Icon(Icons.more_vert, color: themeProvider.currentHintColor),
+                  onSelected: (value) {
+                    if (value == 'report_post') {
+                      _showReportDialog(widget.post.postId, ReportType.message);
+                    } else if (value == 'report_user') {
+                      _showReportDialog(widget.post.authorId, ReportType.user);
+                    }
+                  },
+                  itemBuilder: (BuildContext context) {
+                    final l = Provider.of<L>(context, listen: false);
+                    return [
+                      PopupMenuItem(
+                        value: 'report_post',
+                        child: Row(
+                          children: [
+                            const Icon(Icons.flag_outlined, color: Colors.orange, size: 20),
+                            const SizedBox(width: 8),
+                            Text(l.reportPost),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 'report_user',
+                        child: Row(
+                          children: [
+                            const Icon(Icons.person_off_outlined, color: Colors.red, size: 20),
+                            const SizedBox(width: 8),
+                            Text(l.reportUser),
+                          ],
+                        ),
+                      ),
+                    ];
                   },
                 )
               ],
@@ -302,9 +341,43 @@ class _PostSheetState extends State<PostSheet> {
                                 );
                               },
                             ),
-                            IconButton(
-                              icon: const Icon(Icons.flag_outlined, size: 16, color: Colors.redAccent),
-                              onPressed: () => _showReportDialog(reply.replyId),
+                            PopupMenuButton<String>(
+                              padding: EdgeInsets.zero,
+                              icon: Icon(Icons.more_vert, size: 18, color: themeProvider.currentHintColor),
+                              onSelected: (value) {
+                                if (value == 'report_reply') {
+                                  _showReportDialog(reply.replyId, ReportType.reply);
+                                } else if (value == 'report_user') {
+                                  _showReportDialog(reply.authorId, ReportType.user);
+                                }
+                              },
+                              itemBuilder: (context) {
+                                final l = Provider.of<L>(context, listen: false); 
+                                return [
+                                  PopupMenuItem(
+                                    value: 'report_reply',
+                                    height: 30,
+                                    child: Row(
+                                      children: [
+                                        const Icon(Icons.flag_outlined, size: 16, color: Colors.orange),
+                                        const SizedBox(width: 8),
+                                        Text(l.reportReply, style: const TextStyle(fontSize: 12)),
+                                      ],
+                                    ),
+                                  ),
+                                  PopupMenuItem(
+                                    value: 'report_user',
+                                    height: 30,
+                                    child: Row(
+                                      children: [
+                                        const Icon(Icons.person_off_outlined, size: 16, color: Colors.red),
+                                        const SizedBox(width: 8),
+                                        Text(l.reportUser, style: const TextStyle(fontSize: 12)),
+                                      ],
+                                    ),
+                                  ),
+                                ];
+                              },
                             ),
                           ],
                         ),
