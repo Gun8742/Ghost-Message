@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ghost_message/models/achievement_model.dart';
 import 'package:ghost_message/providers/l_provider.dart';
+import 'package:ghost_message/providers/theme_provider.dart';
 import 'package:ghost_message/providers/user_provider.dart';
 import 'package:ghost_message/services/achievement_firestore_service.dart';
 import 'package:ghost_message/services/user_firestore_service.dart';
@@ -58,6 +59,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final l = Provider.of<L>(context);
     final user = Provider.of<UserProvider>(context);
     final currentUser = user.currentUser;
+    final themeProvider = Provider.of<ThemeProvider>(context);
     if (currentUser == null) {
       return Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -223,28 +225,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               SizedBox(height: 30),
-              Text(
-                textAlign: TextAlign.center,
-                l.badgeTitle,
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-              ),
-              SizedBox(height: 20),
-              SizedBox(
-                height: 180,
-                child: ListView.builder(
-                  padding: EdgeInsets.all(12),
-                  scrollDirection: Axis.horizontal,
-                  itemCount: finishedAchievement.length,
-                  itemBuilder: (context, index) {
-                    return buildBadge(
-                      context,
-                      finishedAchievement[index],
-                      currentUser.uid,
-                    );
-                  },
+              if(finishedAchievement.isNotEmpty) ...[
+                Text(
+                  textAlign: TextAlign.center,
+                  l.badgeTitle,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                 ),
-              ),
-              SizedBox(height: 30),
+                SizedBox(height: 20),
+                SizedBox(
+                  height: 180,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: finishedAchievement.length,
+                    itemBuilder: (context, index) {
+                      return buildBadge(
+                        context,
+                        finishedAchievement[index],
+                        currentUser.uid,
+                      );
+                    },
+                  ),
+                ),
+                SizedBox(height: 30),
+              ],
               Text(
                 textAlign: TextAlign.center,
                 l.achievementTitle,
@@ -293,7 +296,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   IconButton(
                     icon: Icon(
                       Icons.arrow_back_ios,
-                      color: _selectIndex > 0 ? Colors.black : Colors.grey,
+                      color: _selectIndex > 0 
+                          ? themeProvider.currentTextColor 
+                          : themeProvider.currentHintColor,
                     ),
                     onPressed: () {
                       setState(() {
@@ -305,16 +310,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   Text(
                     "${_selectIndex + 1}",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold, 
+                      fontSize: 16,
+                      // 🟢 ใช้ currentTextColor
+                      color: themeProvider.currentTextColor, 
+                    ),
                   ),
                   SizedBox(width: 7),
                   IconButton(
                     icon: Icon(
                       Icons.arrow_forward_ios,
-                      color:
-                          _selectIndex < separatedAchievement.length - 1
-                              ? Colors.black
-                              : Colors.grey,
+                     color: _selectIndex < separatedAchievement.length - 1
+                              ? themeProvider.currentTextColor
+                              : themeProvider.currentHintColor,
                     ),
                     onPressed: () {
                       setState(() {
