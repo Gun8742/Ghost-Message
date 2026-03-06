@@ -134,6 +134,92 @@ class _HomeScreenState extends State<HomeScreen> {
     _circleSet = newCircles;
   }
 
+  void _openSinglePost(PostModel post) {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final currentUser = userProvider.currentUser;
+    if (currentUser == null) return;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => PostSheet(post: post, currentUser: currentUser),
+    );
+  }
+
+  void _showPostListAtLocation(List<PostModel> posts) {
+    final l = Provider.of<L>(context, listen: false);
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: themeProvider.isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                "${l.adminSubMessage} (${posts.length})",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  color: themeProvider.isDarkMode ? Colors.white : Colors.black,
+                ),
+              ),
+            ),
+            const Divider(height: 1),
+            Flexible(
+              child: ListView.separated(
+                shrinkWrap: true,
+                itemCount: posts.length,
+                separatorBuilder: (context, index) => const Divider(height: 1),
+                itemBuilder: (context, index) {
+                  final post = posts[index];
+                  return ListTile(
+                    leading: CircleAvatar(
+                      radius: 18,
+                      backgroundColor: themeProvider.isDarkMode ? Colors.black26 : Colors.grey[200],
+                      backgroundImage: (userProvider.getPhotoPath(post.authorId) != null && 
+                                        userProvider.getPhotoPath(post.authorId)!.isNotEmpty)
+                          ? NetworkImage(userProvider.getPhotoPath(post.authorId)!)
+                          : null,
+                      child: (userProvider.getPhotoPath(post.authorId) == null || 
+                              userProvider.getPhotoPath(post.authorId)!.isEmpty)
+                          ? Icon(Icons.person, size: 18, color: themeProvider.isDarkMode ? Colors.white70 : Colors.black54)
+                          : null,
+                  ),
+                    title: Text(
+                      post.message,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(color: themeProvider.isDarkMode ? Colors.white : Colors.black),
+                    ),
+                    subtitle: Text(
+                      "@${userProvider.getUsernameById(post.authorId)}",
+                      style: const TextStyle(color: Colors.grey, fontSize: 12),
+                    ),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 14),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _openSinglePost(post);
+                    },
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 20),
+          ],
+        );
+      },
+    );
+  }
+
   void _onTapPostMarker(PostModel post) {
     final bool canOpen = _mapService.canOpenMarkerIn20Meters(
       currentPosition: _myPosition,
@@ -146,24 +232,22 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     if (canOpen) {
-      final userProvider = Provider.of<UserProvider>(context, listen: false);
-      final currentUser = userProvider.currentUser;
-      final l = Provider.of<L>(context, listen: false);
-      if (currentUser == null) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(l.pleaseLoginFirst)));
-        return;
-      }
-      showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        backgroundColor: Colors.transparent,
-        builder: (context) {
-          return PostSheet(post: post, currentUser: currentUser);
-        },
+      final List<PostModel> postsAtSameLocation = _realPosts.where((p) {
+      double distance = Geolocator.distanceBetween(
+        post.latitude, post.longitude, 
+        p.latitude, p.longitude
       );
-    } else {
+      return distance < 1.0;
+      }).toList();
+
+      if (postsAtSameLocation.length > 1) {
+        _showPostListAtLocation(postsAtSameLocation);
+      } 
+      else {
+        _openSinglePost(post);
+      }
+    } 
+    else {
       final double remain = distance - 20;
 
       final l = Provider.of<L>(context, listen: false);

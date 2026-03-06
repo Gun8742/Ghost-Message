@@ -73,6 +73,15 @@ class SocialService {
     }
   }
 
+  Future<void> deletePost(String postId) async {
+    try {
+      await _instance.collection("posts").doc(postId).delete();
+    } catch (e) {
+      print("Error deleting post: $e");
+      rethrow;
+    }
+  }
+
   Future<void> deleteReply(String postId, String replyId) async {
     await _instance
         .collection('posts')

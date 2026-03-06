@@ -147,8 +147,35 @@ class _PostSheetState extends State<PostSheet> {
           );
         }
       );
-
     }
+
+    void _deletePost() async {
+      try {
+        await _socialService.deletePost(widget.post.postId);
+        if (mounted) {
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("ลบโพสต์เรียบร้อยแล้ว")),
+          );
+        }
+      } catch (e) {
+        print("Delete Post Error: $e");
+      }
+    }
+
+    void _deleteReply(String replyId) async {
+      try {
+        await _socialService.deleteReply(widget.post.postId, replyId);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("ลบความคิดเห็นเรียบร้อยแล้ว")),
+          );
+        }
+      } catch (e) {
+        print("Delete Reply Error: $e");
+      }
+    }
+
     @override
     void dispose() {
       _replyController.dispose();
@@ -184,33 +211,47 @@ class _PostSheetState extends State<PostSheet> {
                   onSelected: (value) {
                     if (value == 'report_post') {
                       _showReportDialog(widget.post.postId, ReportType.message);
-                    } else if (value == 'report_user') {
+                    } 
+                    else if (value == 'report_user') {
                       _showReportDialog(widget.post.authorId, ReportType.user);
+                    }
+                    else if (value == 'delete_post') {
+                      _deletePost();
                     }
                   },
                   itemBuilder: (BuildContext context) {
                     final l = Provider.of<L>(context, listen: false);
+
+                    final bool isOwner = widget.post.authorId == widget.currentUser.uid;
                     return [
-                      PopupMenuItem(
-                        value: 'report_post',
-                        child: Row(
-                          children: [
-                            const Icon(Icons.flag_outlined, color: Colors.orange, size: 20),
-                            const SizedBox(width: 8),
-                            Text(l.reportPost),
-                          ],
+                      if (!isOwner) ...[
+                        PopupMenuItem(
+                          value: 'report_post',
+                          child: Row(
+                            children: [
+                              const Icon(Icons.flag_outlined, color: Colors.orange, size: 20),
+                              const SizedBox(width: 8),
+                              Text(l.reportPost),
+                            ],
+                          ),
                         ),
-                      ),
-                      PopupMenuItem(
-                        value: 'report_user',
-                        child: Row(
-                          children: [
-                            const Icon(Icons.person_off_outlined, color: Colors.red, size: 20),
-                            const SizedBox(width: 8),
-                            Text(l.reportUser),
-                          ],
+                        PopupMenuItem(
+                          value: 'report_user',
+                          child: Row(
+                            children: [
+                              const Icon(Icons.person_off_outlined, color: Colors.red, size: 20),
+                              const SizedBox(width: 8),
+                              Text(l.reportUser),
+                            ],
+                          ),
                         ),
-                      ),
+                      ]
+                      else ...[
+                        PopupMenuItem(
+                          value: 'delete_post',
+                          child: Row(children: [const Icon(Icons.delete_outline, color: Colors.red), const SizedBox(width: 8), Text(l.adminDelete)]),
+                        ),
+                      ],
                     ];
                   },
                 )
@@ -221,10 +262,14 @@ class _PostSheetState extends State<PostSheet> {
               leading: CircleAvatar(
                 radius: 20,
                 backgroundColor: themeProvider.currentHintColor.withOpacity(0.2),
-                backgroundImage: userProvider.getPhotoPath(widget.post.authorId) == null ? null : NetworkImage(userProvider.getPhotoPath(widget.post.authorId)!),
-                child: userProvider.getPhotoPath(widget.post.authorId) == null 
-                  ? const Text("👻", style: TextStyle(fontSize: 20))
-                  : null,
+                backgroundImage: (userProvider.getPhotoPath(widget.post.authorId) != null && 
+                                  userProvider.getPhotoPath(widget.post.authorId)!.isNotEmpty)
+                    ? NetworkImage(userProvider.getPhotoPath(widget.post.authorId)!)
+                    : null,
+                child: (userProvider.getPhotoPath(widget.post.authorId) == null || 
+                        userProvider.getPhotoPath(widget.post.authorId)!.isEmpty)
+                    ? Icon(Icons.person, color: themeProvider.currentHintColor)
+                    : null,
               ),
               title: Text(
                 "@${userProvider.getUsernameById(widget.post.authorId)}",
@@ -285,8 +330,14 @@ class _PostSheetState extends State<PostSheet> {
                         leading: CircleAvatar(
                           radius: 20,
                           backgroundColor: themeProvider.currentHintColor.withOpacity(0.2),
-                          backgroundImage: userProvider.getPhotoPath(reply.authorId) == "" ? null : NetworkImage(userProvider.getPhotoPath(reply.authorId)!),
-                          child: userProvider.getPhotoPath(reply.authorId) == "" ? const Text("👻", style: TextStyle(fontSize: 20)): null,
+                          backgroundImage: (userProvider.getPhotoPath(reply.authorId) != null && 
+                                            userProvider.getPhotoPath(reply.authorId)!.isNotEmpty)
+                              ? NetworkImage(userProvider.getPhotoPath(reply.authorId)!)
+                              : null,
+                          child: (userProvider.getPhotoPath(reply.authorId) == null || 
+                                  userProvider.getPhotoPath(reply.authorId)!.isEmpty)
+                              ? Icon(Icons.person, color: themeProvider.currentHintColor)
+                              : null,
                         ),
                         title: Text(
                           "@${userProvider.getUsernameById(reply.authorId)}", 
