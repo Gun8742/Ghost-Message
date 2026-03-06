@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:ghost_message/models/user_model.dart';
@@ -46,6 +47,26 @@ class UserProvider extends ChangeNotifier {
       return null;
     }
   }
+
+  Future<void> removeInvalidLikedItem(String id, bool isPost) async {
+  if (currentUser == null) return;
+
+  if (isPost) {
+    currentUser!.likedPosts.remove(id);
+  } else {
+    currentUser!.likedReplies.remove(id);
+  }
+
+  await FirebaseFirestore.instance
+      .collection('users')
+      .doc(currentUser!.uid)
+      .update({
+    isPost ? "liked_posts" : "liked_replies": 
+        FieldValue.arrayRemove([id])
+  });
+
+  notifyListeners();
+}
   
   Future<void> initUser() async {
     _userSubscription = _userFirestoreService.getUsers().listen((users) {

@@ -23,15 +23,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
   int _selectIndex = 0;
   File? _imageFile;
   final _imageService = ImageService();
-  final AchievementFirestoreService _achievementFirestoreService = AchievementFirestoreService();
+  final AchievementFirestoreService _achievementFirestoreService =
+      AchievementFirestoreService();
   late Stream<List<AchievementModel>> _achievementStream;
-
 
   @override
   void initState() {
     final String currentUid = FirebaseAuth.instance.currentUser!.uid;
     super.initState();
-    _achievementStream = _achievementFirestoreService.getAchievements(currentUid);
+    _achievementStream = _achievementFirestoreService.getAchievements(
+      currentUid,
+    );
   }
 
   List<List<AchievementModel>> _chunkList(
@@ -57,11 +59,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final user = Provider.of<UserProvider>(context);
     final currentUser = user.currentUser;
     if (currentUser == null) {
-      return Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        )
-      );
+      return Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     return Scaffold(
       appBar: AppBar(
@@ -86,7 +84,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           }
           final allAchievement = snapshot.data ?? [];
           final separatedAchievement = _chunkList(allAchievement, 4);
-          final finishedAchievement = allAchievement.where((i) => i.isCompleted).toList();
+          final finishedAchievement =
+              allAchievement.where((i) => i.isCompleted).toList();
 
           return ListView(
             padding: EdgeInsets.all(12),
@@ -115,28 +114,52 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ],
                       ),
                       child: ClipOval(
-                        child: _imageFile != null ? Image.file(
-                          _imageFile!,
-                          fit: BoxFit.cover,
-                          width: 200,
-                          height: 200,
-                        ) : (currentUser.photoPath?.isNotEmpty ?? false 
-                        ? Image.network(
-                          currentUser.photoPath!,
-                          fit: BoxFit.cover,
-                          width: 200,
-                          height: 200,
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return const Center(child: CircularProgressIndicator());
-                          },
-                        ) : Image.asset(
-                          "assets/images/black.png",
-                          fit: BoxFit.cover,
-                        )),
-                        )
+                        child:
+                            _imageFile != null
+                                ? Image.file(
+                                  _imageFile!,
+                                  fit: BoxFit.cover,
+                                  width: 200,
+                                  height: 200,
+                                )
+                                : (currentUser.photoPath != null &&
+                                    currentUser.photoPath!.isNotEmpty)
+                                ? Image.network(
+                                  currentUser.photoPath!,
+                                  fit: BoxFit.cover,
+                                  width: 200,
+                                  height: 200,
+                                  loadingBuilder: (
+                                    context,
+                                    child,
+                                    loadingProgress,
+                                  ) {
+                                    if (loadingProgress == null) return child;
+                                    return const Center(
+                                      child: CircularProgressIndicator(),
+                                    );
+                                  },
+                                  errorBuilder:
+                                      (context, error, stackTrace) => Container(
+                                        color: Colors.grey[200],
+                                        child: const Icon(
+                                          Icons.person,
+                                          size: 100,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                )
+                                : Container(
+                                  color: Colors.grey[200],
+                                  child: const Icon(
+                                    Icons.person,
+                                    size: 100,
+                                    color: Colors.grey,
+                                  ),
+                                ),
                       ),
                     ),
+                  ),
                   Positioned(
                     right: 80,
                     bottom: 0,
@@ -150,15 +173,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               _imageFile = file;
                             });
                             final String uid = currentUser.uid;
-                            String? url = await _imageService.uploadProfileImage(uid, file);
+                            String? url = await _imageService
+                                .uploadProfileImage(uid, file);
 
                             if (url != null) {
-                              await UserFirestoreService().updateProfilePicture(uid, url);
+                              await UserFirestoreService().updateProfilePicture(
+                                uid,
+                                url,
+                              );
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text("Profile picture updated!")),
+                                SnackBar(
+                                  content: Text(l.profilePicUpdated),
+                                ),
                               );
                             }
-                          }
+                          },
                         );
                       },
                     ),
@@ -183,7 +212,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     IconButton(
                       icon: Icon(Icons.edit_square),
                       onPressed: () {
-                        showEditUsernameDialog(context, l, currentUser.username);
+                        showEditUsernameDialog(
+                          context,
+                          l,
+                          currentUser.username,
+                        );
                       },
                     ),
                   ],
@@ -203,7 +236,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   scrollDirection: Axis.horizontal,
                   itemCount: finishedAchievement.length,
                   itemBuilder: (context, index) {
-                   return buildBadge(context, finishedAchievement[index], currentUser.uid);
+                    return buildBadge(
+                      context,
+                      finishedAchievement[index],
+                      currentUser.uid,
+                    );
                   },
                 ),
               ),
@@ -243,7 +280,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 index: _selectIndex,
                 children:
                     separatedAchievement.map((items) {
-                      return achievementColumnBuild(context, items, currentUser.uid);
+                      return achievementColumnBuild(
+                        context,
+                        items,
+                        currentUser.uid,
+                      );
                     }).toList(),
               ),
               Row(
@@ -264,22 +305,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   Text(
                     "${_selectIndex + 1}",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                   SizedBox(width: 7),
                   IconButton(
                     icon: Icon(
                       Icons.arrow_forward_ios,
                       color:
-                          _selectIndex < separatedAchievement.length - 1 ? Colors.black : Colors.grey,
+                          _selectIndex < separatedAchievement.length - 1
+                              ? Colors.black
+                              : Colors.grey,
                     ),
                     onPressed: () {
                       setState(() {
-                        if (_selectIndex <
-                            separatedAchievement.length - 1) {
+                        if (_selectIndex < separatedAchievement.length - 1) {
                           _selectIndex++;
                         }
                       });
@@ -295,4 +334,3 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 }
-

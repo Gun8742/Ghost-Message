@@ -81,13 +81,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
         isUserTab
             ? [
               l.adminSubUserList,
-              "${l.adminSubReportedUser} (Pending)",
-              "Checked Users",
+              "${l.adminSubReportedUser} ${l.adminPending}",
+              l.adminSubCheckedUsers
             ]
             : [
               l.adminSubMessage,
-              "${l.adminSubReportedMessage} (Pending)",
-              "Checked Messages",
+              "${l.adminSubReportedMessage} ${l.adminPending}",
+              l.adminSubCheckedMessages,
             ];
 
     List<dynamic> currentList;
@@ -126,7 +126,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
     final buttonText =
         isAllUserTab
             ? (isUserTab ? l.adminUserDetailBtn : l.adminMessageDetailBtn)
-            : "Check";
+            : l.adminCheckBtn;
 
     return Scaffold(
       appBar: AppBar(
@@ -340,8 +340,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                 color: Colors.red,
                                 borderRadius: BorderRadius.circular(4),
                               ),
-                              child: const Text(
-                                "BANNED",
+                              child: Text(
+                                l.adminBannedStatus,
                                 style: TextStyle(
                                   fontSize: 10,
                                   color: Colors.white,
@@ -516,20 +516,152 @@ class _AdminDashboardState extends State<AdminDashboard> {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final l = Provider.of<L>(context, listen: false);
 
+    UserModel? author;
+    try {
+      author = userProvider.allUser.firstWhere((u) => u.uid == message.authorId);
+    } catch (e) {
+      author = null;
+    }
+
     showDialog(
       context: context,
       builder:
           (context) => AlertDialog(
-            title: Text(userProvider.getUsernameById(message.authorId)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: Row(
+              children: [
+                const Icon(Icons.message_outlined, color: Colors.blue),
+                const SizedBox(width: 8),
+                Text(
+                  l.adminMessageDetailBtn,
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                ),
+              ],
+            ),
             content: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(message.content),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l.adminSenderInfo,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blueGrey,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 16,
+                              backgroundColor: Colors.grey[300],
+                              backgroundImage: (author != null &&
+                                      author.photoPath != null &&
+                                      author.photoPath!.isNotEmpty)
+                                  ? NetworkImage(author.photoPath!)
+                                  : null,
+                              child: (author == null ||
+                                      author.photoPath == null ||
+                                      author.photoPath!.isEmpty)
+                                  ? const Icon(Icons.person,
+                                      size: 16, color: Colors.grey)
+                                  : null,
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                author?.username ?? l.adminUnknownUser,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            const Text(
+                              "UID: ",
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            Expanded(
+                              child: SelectableText(
+                                message.authorId,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontFamily: 'Courier',
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.copy, size: 16, color: Colors.blue),
+                              tooltip: "Copy UID",
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                              onPressed: () {
+                                Clipboard.setData(
+                                  ClipboardData(text: message.authorId),
+                                );
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(l.adminCopiedId),
+                                    duration: Duration(seconds: 1),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+                  
+                  Text(
+                    l.adminMessageContent,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blueGrey,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade300),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      message.content,
+                      style: const TextStyle(fontSize: 15),
+                    ),
+                  ),
+                  
                   const SizedBox(height: 10),
                   SelectableText(
-                    "ID: ${message.messageId}",
+                    "${l.adminMessageId}: ${message.messageId}",
                     style: const TextStyle(fontSize: 10, color: Colors.grey),
                   ),
                 ],
@@ -538,7 +670,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: Text(l.adminClose),
+                child: Text(l.adminClose, style: const TextStyle(color: Colors.grey)),
               ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
@@ -550,9 +682,16 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     SnackBar(content: Text(l.adminDeleted)),
                   );
                 },
-                child: Text(
-                  l.adminDelete,
-                  style: TextStyle(color: Colors.white),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.delete_outline, size: 18, color: Colors.white),
+                    const SizedBox(width: 4),
+                    Text(
+                      l.adminDelete,
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -562,22 +701,35 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
   void _showReportActionDialog(ReportModel report) {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final adminProvider = Provider.of<AdminProvider>(context, listen: false);
     final l = Provider.of<L>(context, listen: false);
-    String idLabel = report.type.name == 'user' ? "UID" : "Message ID";
+    
+    final bool isUserReport = report.type.name == 'user';
+    String idLabel = isUserReport ? l.adminTargetUid : l.adminMessageReplyId;
+    
     bool isTargetAdmin = false;
+    UserModel? targetUser;
+    String? reportedContent;
 
-    if (report.type.name == 'user') {
+    if (isUserReport) {
       try {
-        final targetUser = userProvider.allUser.firstWhere((u) => u.uid == report.targetId);
-        
-        if (targetUser.role.toLowerCase() == 'admin') {
-          isTargetAdmin = true;
-        }
+        targetUser = userProvider.allUser.firstWhere((u) => u.uid == report.targetId);
+        isTargetAdmin = targetUser.role.toLowerCase() == 'admin';
       } catch (e) {
-        isTargetAdmin = false;
+        targetUser = null;
+      }
+    } else {
+      try {
+        final msg = adminProvider.allMessages.firstWhere((m) => m.messageId == report.targetId);
+        reportedContent = msg.content;
+        
+        targetUser = userProvider.allUser.firstWhere((u) => u.uid == msg.authorId);
+        isTargetAdmin = targetUser.role.toLowerCase() == 'admin';
+      } catch (e) {
+        reportedContent = l.adminContentNotFound;
       }
     }
-    
+
     showDialog(
       context: context,
       builder:
@@ -585,118 +737,188 @@ class _AdminDashboardState extends State<AdminDashboard> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),
-            title: Text(l.adminReportDetail),
-
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
+            title: Row(
               children: [
+                Icon(Icons.flag_circle, color: Colors.orange[700]),
+                const SizedBox(width: 8),
                 Text(
-                  "${l.adminReportReason}: ${report.reason}",
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
+                  l.adminReportDetail,
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                 ),
-                const Divider(height: 20),
-
-                Text("${l.adminReportType}: ${report.type.name}"),
-                const SizedBox(height: 12),
-
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
+              ],
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.orange.withOpacity(0.1),
+                      border: Border.all(color: Colors.orange.withOpacity(0.5)),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                         "${l.adminReportType}: ${report.type.name.toUpperCase()}",
+                          style: const TextStyle(fontSize: 12, color: Colors.orange),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          "${l.adminReportReason}: ${report.reason}",
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                        ),
+                      ],
+                    ),
                   ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                  const SizedBox(height: 15),
+
+                  if (!isUserReport && reportedContent != null) ...[
+                    Text(
+                      l.adminReportedContent,
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.blueGrey),
+                    ),
+                    const SizedBox(height: 4),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade300),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        reportedContent,
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                  ],
+
+                  Text(
+                    l.adminTargetUserInfo,
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.blueGrey),
+                  ),
+                  const SizedBox(height: 4),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
                           children: [
-                            Text(
-                              idLabel,
-                              style: const TextStyle(
-                                fontSize: 10,
-                                color: Colors.grey,
-                              ),
+                            CircleAvatar(
+                              radius: 16,
+                              backgroundColor: Colors.grey[300],
+                              backgroundImage: (targetUser != null && targetUser.photoPath != null && targetUser.photoPath!.isNotEmpty)
+                                  ? NetworkImage(targetUser.photoPath!)
+                                  : null,
+                              child: (targetUser == null || targetUser.photoPath == null || targetUser.photoPath!.isEmpty)
+                                  ? const Icon(Icons.person, size: 16, color: Colors.grey)
+                                  : null,
                             ),
-                            SelectableText(
-                              report.targetId,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'Courier',
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                targetUser?.username ?? "Unknown User",
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                               ),
                             ),
                           ],
                         ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.copy, color: Colors.blue),
-                        tooltip: "Copy",
-                        onPressed: () {
-                          Clipboard.setData(
-                            ClipboardData(text: report.targetId),
-                          );
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("Copied ID!"),
-                              duration: Duration(seconds: 1),
+                        const Divider(height: 15),
+                        Row(
+                          children: [
+                            const Text("UID: ", style: TextStyle(fontSize: 10, color: Colors.grey)),
+                            Expanded(
+                              child: SelectableText(
+                                targetUser?.uid ?? "N/A",
+                                style: const TextStyle(fontSize: 12, fontFamily: 'Courier', fontWeight: FontWeight.bold),
+                              ),
                             ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                if (isTargetAdmin) ...[
-                  const SizedBox(height: 15),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Colors.blue.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.blue.withOpacity(0.5)),
-                    ),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.security, color: Colors.blue, size: 18),
-                        SizedBox(width: 8),
-                        Text("Admin Account", style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold)),
+                            if (targetUser != null)
+                              IconButton(
+                                icon: const Icon(Icons.copy, size: 16, color: Colors.blue),
+                                tooltip: "Copy UID",
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                                onPressed: () {
+                                  Clipboard.setData(ClipboardData(text: targetUser!.uid));
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(l.adminCopiedId), duration: Duration(seconds: 1)),
+                                  );
+                                },
+                              ),
+                          ],
+                        ),
                       ],
                     ),
                   ),
-                ],
-                if (report.isChecked) ...[
+
                   const SizedBox(height: 15),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.green),
+
+                  Row(
+                    children: [
+                      Text("$idLabel: ", style: const TextStyle(fontSize: 10, color: Colors.grey)),
+                      Expanded(
+                        child: SelectableText(
+                          report.targetId,
+                          style: const TextStyle(fontSize: 10, color: Colors.grey),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  if (isTargetAdmin) ...[
+                    const SizedBox(height: 10),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.blue.withOpacity(0.5)),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.security, color: Colors.blue, size: 18),
+                          SizedBox(width: 8),
+                          Text(l.adminAccountCannotBan, style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 12)),
+                        ],
+                      ),
                     ),
-                    child: const Center(
-                      child: Text(
-                        "ตรวจสอบแล้ว (Checked)",
-                        style: TextStyle(
-                          color: Colors.green,
-                          fontWeight: FontWeight.bold,
+                  ],
+                  if (report.isChecked) ...[
+                    const SizedBox(height: 10),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.green.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.green.withOpacity(0.5)),
+                      ),
+                      child: Center(
+                        child: Text(
+                          l.adminStatusChecked,
+                          style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 12),
                         ),
                       ),
                     ),
-                  ),
+                  ],
                 ],
-              ],
+              ),
             ),
 
             actionsPadding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
             actions: [
-              
               Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -704,19 +926,14 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       ),
                       onPressed: () async {
                         final messenger = ScaffoldMessenger.of(context);
                         Navigator.pop(context);
 
                         if (report.type.name == 'user') {
-                          await AdminFirestoreService().toggleSuspend(
-                            report.targetId,
-                            false,
-                          );
+                          await AdminFirestoreService().toggleSuspend(report.targetId, false);
                         } else {
                           await AdminFirestoreService().deleteContentByReport(
                             targetId: report.targetId,
@@ -729,21 +946,14 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         messenger.showSnackBar(
                           SnackBar(
                             content: Text(
-                              report.type.name == 'user'
-                                  ? l.adminMsgBanSuccess
-                                  : l.adminMsgDeleteSuccess,
+                              report.type.name == 'user' ? l.adminMsgBanSuccess : l.adminMsgDeleteSuccess,
                             ),
                           ),
                         );
                       },
                       child: Text(
-                        report.type.name == 'user'
-                            ? l.adminBanUser
-                            : l.adminDeleteContent,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        report.type.name == 'user' ? l.adminBanUser : l.adminDeleteContent,
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                       ),
                     ),
 
@@ -752,9 +962,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   if (!report.isChecked) ...[
                     OutlinedButton(
                       style: OutlinedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       ),
                       onPressed: () async {
                         final messenger = ScaffoldMessenger.of(context);
@@ -771,10 +979,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
                   TextButton(
                     onPressed: () => Navigator.pop(context),
-                    child: Text(
-                      l.adminClose,
-                      style: const TextStyle(color: Colors.grey),
-                    ),
+                    child: Text(l.adminClose, style: const TextStyle(color: Colors.grey)),
                   ),
                 ],
               ),

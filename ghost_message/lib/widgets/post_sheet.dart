@@ -151,7 +151,7 @@ class _PostSheetState extends State<PostSheet> {
 
     void _deletePost() async {
       try {
-        await _socialService.deletePost(widget.post.postId);
+        await _socialService.deletePost(widget.post.postId, widget.currentUser.uid);
         if (mounted) {
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
@@ -165,7 +165,7 @@ class _PostSheetState extends State<PostSheet> {
 
     void _deleteReply(String replyId) async {
       try {
-        await _socialService.deleteReply(widget.post.postId, replyId);
+        await _socialService.deleteReply(widget.post.postId, replyId, widget.currentUser.uid);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("ลบความคิดเห็นเรียบร้อยแล้ว")),
@@ -398,35 +398,55 @@ class _PostSheetState extends State<PostSheet> {
                               onSelected: (value) {
                                 if (value == 'report_reply') {
                                   _showReportDialog(reply.replyId, ReportType.reply);
-                                } else if (value == 'report_user') {
+                                } 
+                                else if (value == 'report_user') {
                                   _showReportDialog(reply.authorId, ReportType.user);
+                                }
+                                else if (value == 'delete_reply') {
+                                  _deleteReply(reply.replyId);
                                 }
                               },
                               itemBuilder: (context) {
                                 final l = Provider.of<L>(context, listen: false); 
+                                final bool isReplyOwner = reply.authorId == widget.currentUser.uid;
                                 return [
-                                  PopupMenuItem(
-                                    value: 'report_reply',
-                                    height: 30,
-                                    child: Row(
-                                      children: [
-                                        const Icon(Icons.flag_outlined, size: 16, color: Colors.orange),
-                                        const SizedBox(width: 8),
-                                        Text(l.reportReply, style: const TextStyle(fontSize: 12)),
-                                      ],
+                                  if (!isReplyOwner) ...[
+                                    PopupMenuItem(
+                                      value: 'report_reply',
+                                      height: 30,
+                                      child: Row(
+                                        children: [
+                                          const Icon(Icons.flag_outlined, size: 16, color: Colors.orange),
+                                          const SizedBox(width: 8),
+                                          Text(l.reportReply, style: const TextStyle(fontSize: 12)),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                  PopupMenuItem(
-                                    value: 'report_user',
-                                    height: 30,
-                                    child: Row(
-                                      children: [
-                                        const Icon(Icons.person_off_outlined, size: 16, color: Colors.red),
-                                        const SizedBox(width: 8),
-                                        Text(l.reportUser, style: const TextStyle(fontSize: 12)),
-                                      ],
+                                    PopupMenuItem(
+                                      value: 'report_user',
+                                      height: 30,
+                                      child: Row(
+                                        children: [
+                                          const Icon(Icons.person_off_outlined, size: 16, color: Colors.red),
+                                          const SizedBox(width: 8),
+                                          Text(l.reportUser, style: const TextStyle(fontSize: 12)),
+                                        ],
+                                      ),
                                     ),
-                                  ),
+                                  ]
+                                  else ...[
+                                    PopupMenuItem(
+                                      value: 'delete_reply',
+                                      height: 30,
+                                      child: Row(
+                                        children: [
+                                          const Icon(Icons.delete_outline, size: 16, color: Colors.red),
+                                          const SizedBox(width: 8),
+                                          Text(l.adminDelete, style: const TextStyle(fontSize: 12)),
+                                        ],
+                                      ),
+                                    ),
+                                  ]
                                 ];
                               },
                             ),

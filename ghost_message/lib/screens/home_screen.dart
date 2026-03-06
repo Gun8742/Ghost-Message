@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:ghost_message/providers/l_provider.dart';
@@ -134,10 +135,26 @@ class _HomeScreenState extends State<HomeScreen> {
     _circleSet = newCircles;
   }
 
-  void _openSinglePost(PostModel post) {
+  void _openSinglePost(PostModel post) async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final currentUser = userProvider.currentUser;
+    final l = Provider.of<L>(context, listen: false);
     if (currentUser == null) return;
+    final postDoc = await FirebaseFirestore.instance.collection('posts').doc(post.postId).get();
+
+    if (!postDoc.exists) {
+      if (currentUser.likedPosts.contains(post.postId)) {
+        await userProvider.removeInvalidLikedItem(post.postId, true);
+      }
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l.postAlreadyDeleted)),
+        );
+      }
+      return;
+    }
+    if (!mounted) return;
 
     showModalBottomSheet(
       context: context,
@@ -363,14 +380,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                 if (text.isEmpty) return;
                                 setSheetState(() => isSubmitting = true);
                                 try {
-                                  final userProvider =
-                                      Provider.of<UserProvider>(
-                                        context,
-                                        listen: false,
-                                      );
+                                  final userProvider = Provider.of<UserProvider>(context, listen: false);
                                   final currentUser = userProvider.currentUser;
+                                  final l = Provider.of<L>(context, listen: false);
                                   if (currentUser == null)
-                                    throw Exception("Log in First man");
+                                    throw Exception(l.loginFirstToDropMessage);
 
                                   await PostService().createPost(
                                     authorId: currentUser.uid,

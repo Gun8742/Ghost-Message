@@ -70,6 +70,7 @@ class L {
   String get badgeTitle => lang == AppLang.th ? "เหรียญตรา" : "Badge";
   String get achievementTitle => lang == AppLang.th ? "ความสำเร็จ" : "Achievement";
   String get usernameChanged => lang == AppLang.th ? "เปลี่ยนชื่อผู้ใช้สำเร็จ" :  "Username Changed successfully.";
+  String get profilePicUpdated => lang == AppLang.th ? "อัปเดตรูปโปรไฟล์สำเร็จ!" : "Profile picture updated!";
 
   // Admin Dashboard
   String get adminTitle => lang == AppLang.th ? "แอดมิน" : "Admin";
@@ -123,6 +124,24 @@ class L {
   String get adminMsgDeleteSuccess => lang == AppLang.th ? "จัดการเรียบร้อย (ลบเนื้อหา + ลบรายงาน)" : "Success (Content deleted + Report deleted)";
   String get adminMsgBanSuccess => lang == AppLang.th ? "แบนผู้ใช้เรียบร้อย" : "User banned successfully";
 
+  String get adminSubCheckedUsers => lang == AppLang.th ? "ตรวจสอบแล้ว" : "Checked Users";
+  String get adminSubCheckedMessages => lang == AppLang.th ? "ตรวจสอบแล้ว" : "Checked Messages";
+  String get adminPending => lang == AppLang.th ? "(รอตรวจสอบ)" : "(Pending)";
+  String get adminCheckBtn => lang == AppLang.th ? "ตรวจสอบ" : "Check";
+  String get adminBannedStatus => lang == AppLang.th ? "ถูกระงับ" : "BANNED";
+  String get adminSenderInfo => lang == AppLang.th ? "ข้อมูลผู้ส่ง" : "Sender Info";
+  String get adminUnknownUser => lang == AppLang.th ? "ไม่พบผู้ใช้" : "Unknown User";
+  String get adminMessageContent => lang == AppLang.th ? "เนื้อหาข้อความ" : "Message Content";
+  String get adminMessageId => lang == AppLang.th ? "รหัสข้อความ" : "Message ID";
+  String get adminTargetUid => lang == AppLang.th ? "UID เป้าหมาย" : "Target UID";
+  String get adminMessageReplyId => lang == AppLang.th ? "รหัสข้อความ/ตอบกลับ" : "Message / Reply ID";
+  String get adminContentNotFound => lang == AppLang.th ? "ไม่พบเนื้อหา (อาจถูกลบไปแล้วโดยผู้ใช้)" : "Content not found (might be deleted by user)";
+  String get adminReportedContent => lang == AppLang.th ? "เนื้อหาที่ถูกรายงาน" : "Reported Content";
+  String get adminTargetUserInfo => lang == AppLang.th ? "ข้อมูลเป้าหมาย" : "Target User Info";
+  String get adminAccountCannotBan => lang == AppLang.th ? "บัญชีแอดมิน (ไม่สามารถระงับได้)" : "Admin Account (Cannot Ban)";
+  String get adminStatusChecked => lang == AppLang.th ? "ตรวจสอบแล้ว" : "Checked";
+  String get adminCopiedId => lang == AppLang.th ? "คัดลอก ID แล้ว!" : "Copied ID!";
+
   // Leaderboard  
   String get leaderboardTitle => lang == AppLang.th ? "อันดับ" : "Leaderboard";
   String get leaderboardPostTab => lang == AppLang.th ? "จำนวนโพสต์" : "Posts";
@@ -138,7 +157,9 @@ class L {
   String get submitReport => lang == AppLang.th ? "ส่งรายงาน" : "Submit Report";
   String get reportSuccess => lang == AppLang.th ? "ส่งรายงานเรียบร้อยแล้ว" : "Report submitted successfully.";
   String get locationPermissionDenied => lang == AppLang.th ? "ไม่สามารถใช้งานตำแหน่งได้ กรุณาเปิด Location และ Permission" : "Location access denied. Please enable location permissions.";
-  
+  String get postAlreadyDeleted => lang == AppLang.th ? "โพสต์นี้ถูกลบไปแล้ว ระบบกำลังล้างข้อมูลให้คุณ" : "This post has been deleted. Cleaning up data for you...";
+  String get loginFirstToDropMessage => lang == AppLang.th ? "กรุณาล็อกอินก่อนทิ้งข้อความ" : "Please log in first to drop a message.";
+
   String get pleaseLoginFirst => lang == AppLang.th ? "กรุณาล็อกอินก่อนดูข้อความ" : "Please login to view messages";
   
   String distanceTooFar(String dist, String remain) => lang == AppLang.th ? " ไกลเกินไป! ต้องเข้าใกล้อีก $remain m" : "Too far!, Get $remain m closer to open";

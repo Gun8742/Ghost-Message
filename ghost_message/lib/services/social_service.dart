@@ -73,27 +73,37 @@ class SocialService {
     }
   }
 
-  Future<void> deletePost(String postId) async {
-    try {
-      await _instance.collection("posts").doc(postId).delete();
-    } catch (e) {
-      print("Error deleting post: $e");
-      rethrow;
-    }
-  }
+  Future<void> deletePost(String postId, String userId) async {
+  final batch = _instance.batch();
+  
+  final postRef = _instance.collection("posts").doc(postId);
+  final userRef = _instance.collection("users").doc(userId);
 
-  Future<void> deleteReply(String postId, String replyId) async {
-    await _instance
-        .collection('posts')
-        .doc(postId)
-        .collection('replies')
-        .doc(replyId)
-        .delete();
+  batch.delete(postRef);
 
-    await _instance.collection('posts').doc(postId).update({
-      "reply_count": FieldValue.increment(-1)
-    });
-  }
+  batch.update(userRef, {
+    "liked_posts": FieldValue.arrayRemove([postId])
+  });
+
+  await batch.commit();
+}
+
+  Future<void> deleteReply(String postId, String replyId, String userId) async {
+  final batch = _instance.batch();
+  
+  final replyRef = _instance.collection('posts').doc(postId).collection('replies').doc(replyId);
+  final postRef = _instance.collection('posts').doc(postId);
+  final userRef = _instance.collection('users').doc(userId);
+
+  batch.delete(replyRef);
+  batch.update(postRef, {"reply_count": FieldValue.increment(-1)});
+
+  batch.update(userRef, {
+    "liked_replies": FieldValue.arrayRemove([replyId])
+  });
+
+  await batch.commit();
+}
 
   Future<void> toggleLikeReply({
     required String postId,
