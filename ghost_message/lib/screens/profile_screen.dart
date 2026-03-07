@@ -224,6 +224,42 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ],
                 ),
               ),
+              const SizedBox(height: 5),
+              Column(
+                children: [
+                  Text(
+                    "Level ${currentUser.level}",
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.amber,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 60),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: LinearProgressIndicator(
+                        value: currentUser.exp / (currentUser.level * 100),
+                        minHeight: 12,
+                        backgroundColor: themeProvider.currentHintColor.withOpacity(0.2),
+                        valueColor: const AlwaysStoppedAnimation<Color>(Colors.amber),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  
+                  Text(
+                    "${currentUser.exp} / ${currentUser.level * 100} EXP",
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: themeProvider.currentHintColor,
+                    ),
+                  ),
+                ],
+              ),
               SizedBox(height: 30),
               if(finishedAchievement.isNotEmpty) ...[
                 Text(

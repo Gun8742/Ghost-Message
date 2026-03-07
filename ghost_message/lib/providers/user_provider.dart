@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:ghost_message/models/user_model.dart';
+import 'package:ghost_message/services/notification_service.dart';
 import 'package:ghost_message/services/user_firestore_service.dart';
 
 class UserProvider extends ChangeNotifier {
@@ -67,6 +68,65 @@ class UserProvider extends ChangeNotifier {
 
   notifyListeners();
 }
+
+  void updateNotificationSetting(bool value) {
+    final user = currentUser; 
+    if (user != null) {
+      final index = _allUsers.indexWhere((u) => u.uid == user.uid);
+      if (index != -1) {
+        _allUsers[index] = user.copyWith(isNotificationEnabled: value);
+        notifyListeners();
+      }
+    }
+  }
+
+  void updateNearbyChatSetting(bool value) {
+    final user = currentUser; 
+    if (user != null) {
+      final index = _allUsers.indexWhere((u) => u.uid == user.uid);
+      if (index != -1) {
+        _allUsers[index] = user.copyWith(isNearbyChatEnabled: value);
+        notifyListeners();
+      }
+    }
+  }
+
+  void updateLocationSetting(bool value) {
+    final user = currentUser; 
+    if (user != null) {
+      final index = _allUsers.indexWhere((u) => u.uid == user.uid);
+      if (index != -1) {
+        _allUsers[index] = user.copyWith(isLocationEnabled: value);
+        notifyListeners();
+      }
+    }
+  }
+
+  Future<void> gainExp(int amount) async {
+    final user = currentUser;
+    if (user == null) return;
+
+    int newExp = user.exp + amount;
+    int newLevel = user.level;
+
+    int expNeededForNextLevel = newLevel * 100;
+
+    if (newExp >= expNeededForNextLevel) {
+      newLevel++;
+      newExp = 0;
+    }
+    
+    final index = _allUsers.indexWhere((u) => u.uid == user.uid);
+    if (index != -1) {
+      _allUsers[index] = user.copyWith(exp: newExp, level: newLevel);
+      notifyListeners();
+    }
+
+    await FirebaseFirestore.instance.collection('users').doc(user.uid).update({
+      'exp': newExp,
+      'level': newLevel,
+    });
+  }
   
   Future<void> initUser() async {
     _userSubscription = _userFirestoreService.getUsers().listen((users) {
@@ -89,6 +149,8 @@ class UserProvider extends ChangeNotifier {
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser != null) {
       await _userFirestoreService.updateLastActive(currentUser.uid);
+      final notificationService = NotificationService();
+      await notificationService.initNotification(currentUser.uid);
     }
   }
 

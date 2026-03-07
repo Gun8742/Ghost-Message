@@ -77,6 +77,7 @@ class _PostSheetState extends State<PostSheet> {
       _replyController.clear();
       try {
         await _socialService.addReply(reply: newReply);
+        Provider.of<UserProvider>(context, listen: false).gainExp(3);
       } catch (e) {
         print(e);
       }

@@ -12,7 +12,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:ghost_message/models/post_model.dart';
 import 'package:ghost_message/services/map_service.dart';
 import 'package:provider/provider.dart';
-import 'package:ghost_message/widgets/utility.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -392,8 +391,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                     latitude: _myPosition!.latitude,
                                     longitude: _myPosition!.longitude,
                                   );
+                                  Provider.of<UserProvider>(context, listen: false).gainExp(5);
                                   if (mounted) {
-                                    Navigator.pop(context); // ปิดหน้าต่าง
+                                    Navigator.pop(context);
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Text(l.createPostSuccess),
@@ -451,7 +451,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l = Provider.of<L>(context);
     final themeProvider = Provider.of<ThemeProvider>(context);
     final bool isDark = themeProvider.isDarkMode;
 

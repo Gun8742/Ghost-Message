@@ -92,32 +92,35 @@ Widget buildDashboardListItem({
   return Container(
     padding: const EdgeInsets.symmetric(vertical: 8),
     child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Row(
-          children: [
-            CircleAvatar(
-              backgroundColor: Colors.transparent,
-              child: Text(
-                "A",
-                style: TextStyle(
-                  color: avatarTextColor,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+        CircleAvatar(
+          backgroundColor: Colors.transparent,
+          child: Text(
+            "A",
+            style: TextStyle(
+              color: avatarTextColor,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
             ),
-            const SizedBox(width: 10),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: titleColor,
-              ),
-            ),
-          ],
+          ),
         ),
+        const SizedBox(width: 10),
+        
+        Expanded(
+          child: Text(
+            title,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: titleColor,
+            ),
+          ),
+        ),
+        
+        const SizedBox(width: 10),
+        
         ElevatedButton(
           onPressed: onPressed,
           style: ElevatedButton.styleFrom(
