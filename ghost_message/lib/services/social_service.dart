@@ -33,20 +33,39 @@ class SocialService {
     }
     try {
       await batch.commit();
+
       if (!isCurrentlyLiked) {
-         await AchievementFirestoreService().incrementProgress(
-            uid: postOwnerId,
-            type: "QUEST_GET_LIKE"
-          );
-      }
-      else {
+        await _instance
+            .collection('leaderboards')
+            .doc('likes')
+            .collection('entries')
+            .doc(postOwnerId)
+            .update({
+          'count': FieldValue.increment(1),
+          'updated_at': FieldValue.serverTimestamp(),
+        });
+
+        await AchievementFirestoreService().incrementProgress(
+          uid: postOwnerId,
+          type: "QUEST_GET_LIKE",
+        );
+      } else {
+        await _instance
+            .collection('leaderboards')
+            .doc('likes')
+            .collection('entries')
+            .doc(postOwnerId)
+            .update({
+          'count': FieldValue.increment(-1),
+          'updated_at': FieldValue.serverTimestamp(),
+        });
+
         await AchievementFirestoreService().decrementProgress(
-            uid: postOwnerId,
-            type: "QUEST_GET_LIKE"
-          );
+          uid: postOwnerId,
+          type: "QUEST_GET_LIKE",
+        );
       }
-    }
-    catch (e) {
+    } catch (e) {
       rethrow;
     }
   }

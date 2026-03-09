@@ -169,7 +169,7 @@ class _TopCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double size = isCenter ? 80 : 62;
-    final int score = tabIndex == 0 ? item.posts : item.likes;
+    final int score = item.count;
 
     return Container(
       width: isCenter ? 120 : 105,
@@ -186,14 +186,18 @@ class _TopCard extends StatelessWidget {
               CircleAvatar(
                 radius: size / 2,
                 backgroundColor: Colors.white.withOpacity(0.12),
-                child: Text(
-                  item.name.isNotEmpty ? item.name[0].toUpperCase() : "?",
-                  style: TextStyle(
-                    color: textColor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 22,
-                  ),
-                ),
+                backgroundImage:
+                    item.photoPath.isNotEmpty ? NetworkImage(item.photoPath) : null,
+                child: item.photoPath.isEmpty
+                    ? Text(
+                        item.name.isNotEmpty ? item.name[0].toUpperCase() : "?",
+                        style: TextStyle(
+                          color: textColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 22,
+                        ),
+                      )
+                    : null,
               ),
               if (rank == 1)
                 const Positioned(
@@ -248,24 +252,31 @@ class LeaderboardList extends StatelessWidget {
       child: Column(
         children: List.generate(items.length, (index) {
           final item = items[index];
-          final score = tabIndex == 0 ? item.posts : item.likes;
+          final score = item.count;
 
           return Column(
             children: [
               ListTile(
                 leading: CircleAvatar(
                   backgroundColor: fieldColor,
-                  child: Text(
-                    item.name.isNotEmpty ? item.name[0].toUpperCase() : "?",
-                    style: TextStyle(color: textColor, fontWeight: FontWeight.bold),
-                  ),
+                  backgroundImage:
+                      item.photoPath.isNotEmpty ? NetworkImage(item.photoPath) : null,
+                  child: item.photoPath.isEmpty
+                      ? Text(
+                          item.name.isNotEmpty ? item.name[0].toUpperCase() : "?",
+                          style: TextStyle(
+                            color: textColor,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        )
+                      : null,
                 ),
                 title: Text(
                   item.name,
                   style: TextStyle(color: textColor, fontWeight: FontWeight.bold),
                 ),
                 subtitle: Text(
-                  tabIndex == 0 ? "${item.posts} posts" : "${item.likes} likes",
+                  tabIndex == 0 ? "${item.count} posts" : "${item.count} likes",
                   style: TextStyle(color: textColor.withOpacity(0.7)),
                 ),
                 trailing: Text(

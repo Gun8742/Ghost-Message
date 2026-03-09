@@ -179,9 +179,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 .uploadProfileImage(uid, file);
 
                             if (url != null) {
-                              await UserFirestoreService().updateProfilePicture(
-                                uid,
-                                url,
+                              await UserFirestoreService().updateUserPhotoEverywhere(
+                                uid: uid,
+                                photoPath: url,
                               );
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(

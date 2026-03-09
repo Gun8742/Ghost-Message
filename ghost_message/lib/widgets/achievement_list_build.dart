@@ -3,6 +3,33 @@ import 'package:ghost_message/models/achievement_model.dart';
 import 'package:ghost_message/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
 
+String getAchievementAssetPath(int sequence) {
+  switch (sequence) {
+    case 1:
+      return 'assets/images/achievements/ghost_message_1.png';
+    case 2:
+      return 'assets/images/achievements/ghost_message_5.png';
+    case 3:
+      return 'assets/images/achievements/ghost_message_50.png';
+    case 4:
+      return 'assets/images/achievements/ghost_message_250.png';
+    case 5:
+      return 'assets/images/achievements/ghost_message_1000.png';
+    case 6:
+      return 'assets/images/achievements/ghost_like_1.png';
+    case 7:
+      return 'assets/images/achievements/ghost_like_10.png';
+    case 8:
+      return 'assets/images/achievements/ghost_like_100.png';
+    case 9:
+      return 'assets/images/achievements/ghost_like_500.png';
+    case 10:
+      return 'assets/images/achievements/ghost_like_1000.png';
+    default:
+      return 'assets/images/achievements/default_ghost.png';
+  }
+}
+
 Widget buildAchievement(BuildContext context, AchievementModel item, String uid) {
   final themeProvider = Provider.of<ThemeProvider>(context);
   final bool isDark = themeProvider.isDarkMode;
@@ -36,18 +63,30 @@ Widget buildAchievement(BuildContext context, AchievementModel item, String uid)
               color: item.isCompleted ? Colors.green : (isDark ? ThemeProvider.buttonDark : Colors.deepPurple.shade50),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Center(
-              child: item.isCompleted
-                  ? Icon(Icons.check, color: Colors.white)
-                  : Text(
-                      item.title[0],
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: item.isCompleted ? Colors.white : (isDark ? ThemeProvider.textDark : Colors.deepPurple.shade700),
-                        fontSize: 20,
+            child: Padding(
+              padding: const EdgeInsets.all(8),
+              child: Opacity(
+                opacity: item.isCompleted ? 1 : 0.55,
+                child: Image.asset(
+                  getAchievementAssetPath(item.sequence),
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Center(
+                      child: Text(
+                        item.title.isNotEmpty ? item.title[0] : '?',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: isDark
+                              ? ThemeProvider.textDark
+                              : Colors.deepPurple.shade700,
+                          fontSize: 20,
+                        ),
                       ),
-                    ),
-            ),
+                    );
+                  },
+                ),
+              ),
+            )
           ),
           SizedBox(width: 16),
 
@@ -129,7 +168,16 @@ Widget buildBadge(BuildContext context, AchievementModel item, String uid) {
           ],
         ),
         child: ClipOval(
-          child: Icon(Icons.emoji_events, size: 50, color: Colors.amber.shade200),
+          child: Padding(
+            padding: const EdgeInsets.all(18),
+            child: Image.asset(
+              getAchievementAssetPath(item.sequence),
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) {
+                return Icon(Icons.emoji_events, size: 50, color: Colors.amber.shade200);
+              },
+            ),
+          ),
         ),
       ),
       const SizedBox(height: 8),
