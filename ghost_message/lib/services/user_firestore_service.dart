@@ -25,6 +25,16 @@ class UserFirestoreService {
     });
   }
 
+  Future<void> updateLocationSetting(String uid, bool isEnabled) async {
+    try {
+      await FirebaseFirestore.instance.collection('users').doc(uid).update({
+        'is_location_enabled': isEnabled,
+      });
+    } catch (e) {
+      print("Update Location Setting Error: $e");
+    }
+  }
+
 
   Future<void> updateTheme(String uid, bool isDark) async {
     try {

@@ -20,7 +20,6 @@ class SettingScreen extends StatefulWidget {
 class _SettingScreenState extends State<SettingScreen> {
   bool _notification = true;
   bool _nearbyChatNotification = true;
-  bool _location = true;
 
   final UserFirestoreService _userFirestoreService = UserFirestoreService();
 
@@ -75,8 +74,12 @@ class _SettingScreenState extends State<SettingScreen> {
 
           buildSettingSwitchRow(
             title: l.settingLocation,
-            value: _location,
-            onChanged: (val) => setState(() => _location = val),
+            value: currentUser.isLocationEnabled, 
+            onChanged: (val) {
+              user.updateLocationSetting(val);
+              
+              _userFirestoreService.updateLocationSetting(currentUser.uid, val);
+            },
           ),
 
           const SizedBox(height: 35),

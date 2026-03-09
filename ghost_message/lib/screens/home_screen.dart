@@ -441,6 +441,26 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  void _manageLocationSync() {
+    final userProvider = Provider.of<UserProvider>(context);
+    final currentUser = userProvider.currentUser;
+
+    if (currentUser == null || !currentUser.isLocationEnabled) {
+      _mapService.dispose();
+      
+      if (mounted && _myPosition != null) {
+        setState(() {
+          _myPosition = null;
+          _rebuildMapData();
+        });
+      }
+    } else {
+      if (_myPosition == null) {
+        _initMapSystem(); 
+      }
+    }
+  }
+
   @override
   void dispose() {
     _postStreamSubscription?.cancel();
@@ -451,6 +471,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    _manageLocationSync();
     final themeProvider = Provider.of<ThemeProvider>(context);
     final bool isDark = themeProvider.isDarkMode;
 

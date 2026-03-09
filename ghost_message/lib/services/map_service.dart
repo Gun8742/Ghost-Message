@@ -37,6 +37,8 @@ class MapService {
     return true;
   }
 
+  
+
   Future<Position?> getCurrentLocation() async {
     try {
       _currentPosition = await Geolocator.getCurrentPosition(
