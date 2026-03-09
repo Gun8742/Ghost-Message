@@ -17,13 +17,6 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
   final LeaderboardService _leaderboardService = LeaderboardService();
 
   int _tabIndex = 0;
-  late List<LeaderboardItemModel> _mockData;
-
-  @override
-  void initState() {
-    super.initState();
-    _mockData = _leaderboardService.getMockData();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,8 +28,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
     final Color bg = isDark ? ThemeProvider.bgDark : ThemeProvider.bgLight;
     final Color text = isDark ? ThemeProvider.textDark : ThemeProvider.textLight;
 
-    final sorted = _leaderboardService.sortByTab(list: _mockData, tabIndex: _tabIndex);
-    final top3 = sorted.length >= 3 ? sorted.sublist(0, 3) : <LeaderboardItemModel>[];
+    final String boardId = _tabIndex == 0 ? 'posts' : 'likes';
 
     return Scaffold(
       backgroundColor: bg,
@@ -47,34 +39,57 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
         foregroundColor: text,
         elevation: 0,
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          LeaderboardTabs(
-            tabIndex: _tabIndex,
-            onChangeTab: (i) {
-              setState(() {
-                _tabIndex = i;
-              });
-            },
-            leftText: l.leaderboardPostTab,
-            rightText: l.leaderboardLikeTab,
-          ),
+      body: StreamBuilder<List<LeaderboardItemModel>>(
+        stream: _leaderboardService.streamLeaderboard(boardId: boardId),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
 
-          const SizedBox(height: 18),
+          if (snapshot.hasError) {
+            return Center(
+              child: Text(
+                'Failed to load leaderboard',
+                style: TextStyle(
+                  color: text,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            );
+          }
 
-          LeaderboardTop3(
-            items: top3,
-            tabIndex: _tabIndex,
-          ),
+          final List<LeaderboardItemModel> items = snapshot.data ?? [];
+          final List<LeaderboardItemModel> top3 =
+              items.length >= 3 ? items.sublist(0, 3) : items;
 
-          const SizedBox(height: 18),
-
-          LeaderboardList(
-            items: sorted,
-            tabIndex: _tabIndex,
-          ),
-        ],
+          return ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              LeaderboardTabs(
+                tabIndex: _tabIndex,
+                onChangeTab: (i) {
+                  setState(() {
+                    _tabIndex = i;
+                  });
+                },
+                leftText: l.leaderboardPostTab,
+                rightText: l.leaderboardLikeTab,
+              ),
+              const SizedBox(height: 18),
+              LeaderboardTop3(
+                items: top3,
+                tabIndex: _tabIndex,
+              ),
+              const SizedBox(height: 18),
+              LeaderboardList(
+                items: items,
+                tabIndex: _tabIndex,
+              ),
+            ],
+          );
+        },
       ),
     );
   }

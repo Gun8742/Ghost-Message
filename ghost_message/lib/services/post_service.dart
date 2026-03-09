@@ -22,8 +22,17 @@ class PostService {
       createdAt: DateTime.now(),
     );
  
-   await reference.set(newPost.toMap());
-   await AchievementFirestoreService().incrementProgress(
+    await reference.set(newPost.toMap());
+    await _instance
+        .collection('leaderboards')
+        .doc('posts')
+        .collection('entries')
+        .doc(authorId)
+        .update({
+      'count': FieldValue.increment(1),
+      'updated_at': FieldValue.serverTimestamp(),
+    });
+    await AchievementFirestoreService().incrementProgress(
         uid: authorId, 
         type: "QUEST_SEND_MSG"
       );
