@@ -11,6 +11,7 @@ import 'package:ghost_message/widgets/post_sheet.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:ghost_message/models/post_model.dart';
 import 'package:ghost_message/services/map_service.dart';
+import 'package:ghost_message/services/notification_service.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -36,6 +37,10 @@ class _HomeScreenState extends State<HomeScreen> {
   List<PostModel> _realPosts = [];
   Set<Marker> _markerSet = {};
   Set<Circle> _circleSet = {};
+  final Set<String> _seenNearbyPostIds = {};
+  bool _hasLoadedInitialNearbyPosts = false;
+  DateTime? _homeOpenedAt;
+  Position? _lastNotificationBasePosition;
 
   static const CameraPosition _defaultCameraPosition = CameraPosition(
     target: LatLng(13.847500, 100.571500),
@@ -45,6 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    _homeOpenedAt = DateTime.now();
     _initMapSystem();
   }
 
@@ -76,6 +82,8 @@ class _HomeScreenState extends State<HomeScreen> {
       if (!context.mounted) {
         return;
       }
+      _handleNearbyPostNotifications(posts);
+
       setState(() {
         _realPosts = posts;
         _rebuildMapData();
@@ -85,6 +93,8 @@ class _HomeScreenState extends State<HomeScreen> {
     _mapService.startRealtimeLocation(
       onChanged: (Position position) {
         if (!mounted) return;
+
+         _resetNearbyNotificationStateIfNeeded(position);
 
         setState(() {
           _myPosition = position;
@@ -132,6 +142,61 @@ class _HomeScreenState extends State<HomeScreen> {
 
     _markerSet = newMarkers;
     _circleSet = newCircles;
+  }
+
+  void _handleNearbyPostNotifications(List<PostModel> posts) {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final currentUser = userProvider.currentUser;
+
+    if (currentUser == null) {
+      return;
+    }
+
+    if (!currentUser.isNotificationEnabled ||
+        !currentUser.isNearbyChatEnabled ||
+        !currentUser.isLocationEnabled) {
+      return;
+    }
+
+    if (_myPosition == null) {
+      return;
+    }
+
+    final List<PostModel> nearbyPosts = posts.where((post) {
+      if (post.authorId == currentUser.uid) {
+        return false;
+      }
+
+      final double distance = Geolocator.distanceBetween(
+        _myPosition!.latitude,
+        _myPosition!.longitude,
+        post.latitude,
+        post.longitude,
+      );
+
+      return distance <= 20.0;
+    }).toList();
+
+    if (!_hasLoadedInitialNearbyPosts) {
+      _seenNearbyPostIds.addAll(nearbyPosts.map((post) => post.postId));
+      _hasLoadedInitialNearbyPosts = true;
+      return;
+    }
+    
+    final List<PostModel> newNearbyPosts = nearbyPosts.where((post) {
+        return !_seenNearbyPostIds.contains(post.postId);
+    }).toList();
+
+    for (final post in newNearbyPosts) {
+      final String authorName = userProvider.getUsernameById(post.authorId);
+
+      NotificationService().showInAppSnackBar(
+        title: "New Nearby Post",
+        body: "$authorName posted a new ghost message nearby",
+      );
+
+      _seenNearbyPostIds.add(post.postId);
+    }
   }
 
   void _openSinglePost(PostModel post) async {
@@ -467,6 +532,27 @@ class _HomeScreenState extends State<HomeScreen> {
     _mapService.dispose();
     _googleMapController?.dispose();
     super.dispose();
+  }
+
+  void _resetNearbyNotificationStateIfNeeded(Position newPosition) {
+    if (_lastNotificationBasePosition == null) {
+      _lastNotificationBasePosition = newPosition;
+      return;
+    }
+
+    final double movedDistance = Geolocator.distanceBetween(
+      _lastNotificationBasePosition!.latitude,
+      _lastNotificationBasePosition!.longitude,
+      newPosition.latitude,
+      newPosition.longitude,
+    );
+
+    if (movedDistance > 50) {
+      _seenNearbyPostIds.clear();
+      _hasLoadedInitialNearbyPosts = false;
+      _homeOpenedAt = DateTime.now();
+      _lastNotificationBasePosition = newPosition;
+    }
   }
 
   @override

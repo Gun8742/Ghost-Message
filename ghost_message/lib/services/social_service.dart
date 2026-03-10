@@ -1,9 +1,28 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ghost_message/models/reply_model.dart';
 import 'package:ghost_message/services/achievement_firestore_service.dart';
+import 'package:ghost_message/services/notification_service.dart';
 
 class SocialService {
   final FirebaseFirestore _instance = FirebaseFirestore.instance;
+
+  Future<String> _getUsernameByUid(String uid) async {
+    final doc = await _instance.collection("users").doc(uid).get();
+    if (!doc.exists) {
+      return "Someone";
+    }
+    final data = doc.data();
+    return data?["username"] ?? "Someone";
+  }
+
+  Future<String?> _getPostOwnerId(String postId) async {
+    final doc = await _instance.collection("posts").doc(postId).get();
+    if (!doc.exists) {
+      return null;
+    }
+    final data = doc.data();
+    return data?["author_id"];
+  }
 
   Future<void> toggleLike({
     required String postId,
@@ -45,6 +64,18 @@ class SocialService {
           'updated_at': FieldValue.serverTimestamp(),
         });
 
+        final String actorName = await _getUsernameByUid(userId);
+
+        await NotificationService().createUserNotification(
+          recipientUid: postOwnerId,
+          actorUid: userId,
+          actorName: actorName,
+          type: "like",
+          title: "New Like",
+          body: "$actorName liked your post",
+          postId: postId,
+        );
+
         await AchievementFirestoreService().incrementProgress(
           uid: postOwnerId,
           type: "QUEST_GET_LIKE",
@@ -74,20 +105,39 @@ class SocialService {
     required ReplyModel reply,
   }) async {
     final batch = _instance.batch();
-    final replyRef = _instance.collection("posts").doc(reply.postId)
-    .collection("replies").doc(reply.replyId);
+
+    final replyRef = _instance
+        .collection("posts")
+        .doc(reply.postId)
+        .collection("replies")
+        .doc(reply.replyId);
 
     batch.set(replyRef, reply.toMap());
-    
+
     final postRef = _instance.collection("posts").doc(reply.postId);
     batch.update(postRef, {
       "reply_count": FieldValue.increment(1),
     });
 
+    final String? postOwnerId = await _getPostOwnerId(reply.postId);
+
     try {
       await batch.commit();
-    }
-    catch (e) {
+
+      if (postOwnerId != null && postOwnerId != reply.authorId) {
+        final String actorName = await _getUsernameByUid(reply.authorId);
+
+        await NotificationService().createUserNotification(
+          recipientUid: postOwnerId,
+          actorUid: reply.authorId,
+          actorName: actorName,
+          type: "reply",
+          title: "New Reply",
+          body: "$actorName replied to your post",
+          postId: reply.postId,
+        );
+      }
+    } catch (e) {
       rethrow;
     }
   }

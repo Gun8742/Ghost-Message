@@ -6,6 +6,7 @@ import 'package:ghost_message/services/user_firestore_service.dart';
 import 'package:provider/provider.dart';
 import 'package:ghost_message/providers/l_provider.dart';
 import 'package:ghost_message/providers/language_provider.dart';
+import 'package:ghost_message/services/notification_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:ghost_message/widgets/utility.dart';
@@ -190,6 +191,7 @@ class _SettingScreenState extends State<SettingScreen> {
                       TextButton(
                         onPressed: () async {
                           navigationProvider.setIndex(1);
+                          await NotificationService().stopInAppNotificationListener();
                           await FirebaseAuth.instance.signOut();
                           if (context.mounted) {
                             Navigator.pushNamedAndRemoveUntil(
