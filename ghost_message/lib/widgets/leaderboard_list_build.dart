@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ghost_message/models/leaderboard_item_model.dart';
 import 'package:ghost_message/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:ghost_message/providers/user_provider.dart';
 
 class LeaderboardTabs extends StatelessWidget {
   const LeaderboardTabs({
@@ -102,10 +103,12 @@ class LeaderboardTop3 extends StatelessWidget {
     super.key,
     required this.items,
     required this.tabIndex,
+    required this.userProvider,
   });
 
   final List<LeaderboardItemModel> items;
   final int tabIndex;
+  final UserProvider userProvider;
 
   @override
   Widget build(BuildContext context) {
@@ -126,6 +129,8 @@ class LeaderboardTop3 extends StatelessWidget {
           tabIndex: tabIndex,
           cardColor: cardColor,
           textColor: textColor,
+          userProvider: userProvider,
+          
         ),
         _TopCard(
           item: items[0],
@@ -134,6 +139,7 @@ class LeaderboardTop3 extends StatelessWidget {
           cardColor: cardColor,
           textColor: textColor,
           isCenter: true,
+          userProvider: userProvider,
         ),
         _TopCard(
           item: items[2],
@@ -141,6 +147,7 @@ class LeaderboardTop3 extends StatelessWidget {
           tabIndex: tabIndex,
           cardColor: cardColor,
           textColor: textColor,
+          userProvider: userProvider,
         ),
       ],
     );
@@ -154,10 +161,12 @@ class _TopCard extends StatelessWidget {
     required this.tabIndex,
     required this.cardColor,
     required this.textColor,
+    required this.userProvider,
     this.isCenter = false,
   });
 
   final LeaderboardItemModel item;
+  final UserProvider userProvider;
   final int rank;
   final int tabIndex;
 
@@ -170,6 +179,7 @@ class _TopCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final double size = isCenter ? 80 : 62;
     final int score = item.count;
+    final String? photoPath = userProvider.getPhotoPath(item.uid);
 
     return Container(
       width: isCenter ? 120 : 105,
@@ -187,8 +197,8 @@ class _TopCard extends StatelessWidget {
                 radius: size / 2,
                 backgroundColor: Colors.white.withOpacity(0.12),
                 backgroundImage:
-                    item.photoPath.isNotEmpty ? NetworkImage(item.photoPath) : null,
-                child: item.photoPath.isEmpty
+                    (photoPath != null && photoPath.isNotEmpty) ? NetworkImage(photoPath) : null,
+                child: (photoPath == null || photoPath.isEmpty)
                     ? Text(
                         item.name.isNotEmpty ? item.name[0].toUpperCase() : "?",
                         style: TextStyle(
@@ -229,10 +239,12 @@ class LeaderboardList extends StatelessWidget {
     super.key,
     required this.items,
     required this.tabIndex,
+    required this.userProvider,
   });
 
   final List<LeaderboardItemModel> items;
   final int tabIndex;
+  final UserProvider userProvider;
 
   @override
   Widget build(BuildContext context) {
@@ -253,6 +265,7 @@ class LeaderboardList extends StatelessWidget {
         children: List.generate(items.length, (index) {
           final item = items[index];
           final score = item.count;
+          final String? photoPath = userProvider.getPhotoPath(item.uid);
 
           return Column(
             children: [
@@ -260,8 +273,8 @@ class LeaderboardList extends StatelessWidget {
                 leading: CircleAvatar(
                   backgroundColor: fieldColor,
                   backgroundImage:
-                      item.photoPath.isNotEmpty ? NetworkImage(item.photoPath) : null,
-                  child: item.photoPath.isEmpty
+                      (photoPath != null && photoPath.isNotEmpty) ? NetworkImage(photoPath) : null,
+                  child: (photoPath == null || photoPath.isEmpty)
                       ? Text(
                           item.name.isNotEmpty ? item.name[0].toUpperCase() : "?",
                           style: TextStyle(

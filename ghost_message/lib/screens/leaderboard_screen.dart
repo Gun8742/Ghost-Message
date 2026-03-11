@@ -5,6 +5,7 @@ import 'package:ghost_message/providers/theme_provider.dart';
 import 'package:ghost_message/services/leaderboard_service.dart';
 import 'package:ghost_message/widgets/leaderboard_list_build.dart';
 import 'package:provider/provider.dart';
+import 'package:ghost_message/providers/user_provider.dart';
 
 class LeaderboardScreen extends StatefulWidget {
   const LeaderboardScreen({super.key});
@@ -29,6 +30,8 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
     final Color text = isDark ? ThemeProvider.textDark : ThemeProvider.textLight;
 
     final String boardId = _tabIndex == 0 ? 'posts' : 'likes';
+
+    final userProvider = Provider.of<UserProvider>(context);
 
     return Scaffold(
       backgroundColor: bg,
@@ -81,11 +84,13 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
               LeaderboardTop3(
                 items: top3,
                 tabIndex: _tabIndex,
+                userProvider: userProvider,
               ),
               const SizedBox(height: 18),
               LeaderboardList(
                 items: items,
                 tabIndex: _tabIndex,
+                userProvider: userProvider,
               ),
             ],
           );
