@@ -2,13 +2,14 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:ghost_message/app_scaffold_keys.dart';
+import 'local_notification_service.dart';
 import 'dart:io';
 import 'dart:async';
 
 
 class NotificationService {
   NotificationService._internal();
-  static final NotificationService _instance = NotificationService._internal();
+  static final NotificationService _instance = NotificationService._internal(); 
   factory NotificationService() => _instance;
 
   final FirebaseMessaging _fcm = FirebaseMessaging.instance;
@@ -50,11 +51,13 @@ class NotificationService {
       });
 
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-        print('Got a message whilst in the foreground!');
-        if (message.notification != null) {
-          print('Notification Title: ${message.notification!.title}');
-          print('Notification Body: ${message.notification!.body}');
-        }
+        final title = message.notification?.title ?? "";
+        final body = message.notification?.body ?? "";
+
+        LocalNotificationService.show(
+          title: title,
+          body: body,
+        );
       });
 
       FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
@@ -200,5 +203,21 @@ class NotificationService {
       "fcm_token": token,
       }
     );
+  }
+
+  Future<void> saveFcmToken(String uid) async {
+
+    final token = await FirebaseMessaging.instance.getToken();
+
+    if (token == null) return;
+
+    await FirebaseFirestore.instance
+        .collection("users")
+        .doc(uid)
+        .update({
+      "fcm_token": token,
+    });
+
+    print("FCM TOKEN SAVED: $token");
   }
 }

@@ -267,4 +267,24 @@ class UserFirestoreService {
     });
   }
 
+  Future<void> updateNotificationSetting(String uid, bool isEnabled) async {
+    try {
+      await _instance.collection('users').doc(uid).update({
+        'is_notification_enabled': isEnabled,
+      });
+    } catch (e) {
+      print("Update Notification Setting Error: $e");
+    }
+  }
+
+  Future<void> updateNearbyChatSetting(String uid, bool isEnabled) async {
+    try {
+      await _instance.collection('users').doc(uid).update({
+        'is_nearby_chat_enabled': isEnabled,
+      });
+    } catch (e) {
+      print("Update Nearby Chat Setting Error: $e");
+    }
+  }
+
 }

@@ -57,16 +57,22 @@ class _SettingScreenState extends State<SettingScreen> {
 
           buildSettingSwitchRow(
             title: l.settingNotification,
-            value: _notification,
-            onChanged: (val) => setState(() => _notification = val),
+            value: currentUser.isNotificationEnabled,
+            onChanged: (val) {
+              user.updateNotificationSetting(val);
+              _userFirestoreService.updateNotificationSetting(currentUser.uid, val);
+            },
           ),
 
           const SizedBox(height: 10),
 
           buildSettingSwitchRow(
             title: l.settingNearbyChat,
-            value: _nearbyChatNotification,
-            onChanged: (val) => setState(() => _nearbyChatNotification = val),
+            value: currentUser.isNearbyChatEnabled,
+            onChanged: (val) {
+              user.updateNearbyChatSetting(val);
+              _userFirestoreService.updateNearbyChatSetting(currentUser.uid, val);
+            },
           ),
 
           const SizedBox(height: 35),

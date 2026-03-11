@@ -78,11 +78,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
     _myPosition = currentPosition;
 
-    _postStreamSubscription = _postService.streamNearByPosts().listen((posts) {
+    _postStreamSubscription = _postService.streamNearByPosts().listen((posts) async {
       if (!context.mounted) {
         return;
       }
-      _handleNearbyPostNotifications(posts);
+
+      await _handleNearbyPostNotifications(posts);
+
+      if (!mounted) return;
 
       setState(() {
         _realPosts = posts;
@@ -144,7 +147,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _circleSet = newCircles;
   }
 
-  void _handleNearbyPostNotifications(List<PostModel> posts) {
+  Future<void> _handleNearbyPostNotifications(List<PostModel> posts) async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final currentUser = userProvider.currentUser;
 
@@ -189,6 +192,16 @@ class _HomeScreenState extends State<HomeScreen> {
 
     for (final post in newNearbyPosts) {
       final String authorName = userProvider.getUsernameById(post.authorId);
+
+      await NotificationService().createUserNotification(
+        recipientUid: currentUser.uid,
+        actorUid: post.authorId,
+        actorName: authorName,
+        type: "nearby_post",
+        title: "New Nearby Post",
+        body: "$authorName posted a new ghost message nearby",
+        postId: post.postId,
+      );
 
       NotificationService().showInAppSnackBar(
         title: "New Nearby Post",
