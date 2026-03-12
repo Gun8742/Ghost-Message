@@ -60,6 +60,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final user = Provider.of<UserProvider>(context);
     final currentUser = user.currentUser;
     final themeProvider = Provider.of<ThemeProvider>(context);
+    final bool isDark = themeProvider.isDarkMode;
     if (currentUser == null) {
       return Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -304,12 +305,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
+                    backgroundColor: isDark ? ThemeProvider.buttonDark : ThemeProvider.buttonLight,
                     elevation: 0,
                     shape: const StadiumBorder(),
                   ),
                   child: Text(
                     l.leaderboardButton,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? ThemeProvider.textDark : ThemeProvider.textLight),
                   ),
                 ),
               ),
