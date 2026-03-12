@@ -133,7 +133,7 @@ class L {
   String get adminUnknownUser => lang == AppLang.th ? "ไม่พบผู้ใช้" : "Unknown User";
   String get adminMessageContent => lang == AppLang.th ? "เนื้อหาข้อความ" : "Message Content";
   String get adminMessageId => lang == AppLang.th ? "รหัสข้อความ" : "Message ID";
-  String get adminTargetUid => lang == AppLang.th ? "UID เป้าหมาย" : "Target UID";
+  String get adminTargetUid => lang == AppLang.th ? "UID คนส่งรายงาน" : "Reported by UID";
   String get adminMessageReplyId => lang == AppLang.th ? "รหัสข้อความ/ตอบกลับ" : "Message / Reply ID";
   String get adminContentNotFound => lang == AppLang.th ? "ไม่พบเนื้อหา (อาจถูกลบไปแล้วโดยผู้ใช้)" : "Content not found (might be deleted by user)";
   String get adminReportedContent => lang == AppLang.th ? "เนื้อหาที่ถูกรายงาน" : "Reported Content";
@@ -144,8 +144,8 @@ class L {
 
   // Leaderboard  
   String get leaderboardTitle => lang == AppLang.th ? "อันดับ" : "Leaderboard";
-  String get leaderboardPostTab => lang == AppLang.th ? "จำนวนโพสต์" : "Posts";
-  String get leaderboardLikeTab => lang == AppLang.th ? "ไลก์" : "Likes";
+  String get leaderboardPostTab => lang == AppLang.th ? "โพสต์" : "Posts";
+  String get leaderboardLikeTab => lang == AppLang.th ? "ถูกใจ" : "Likes";
   String get leaderboardButton => lang == AppLang.th ? "ตารางอันดับ" : "Leaderboard";
 
   //HOme page

@@ -95,7 +95,7 @@ class MapService {
       endLng: post.longitude,
     );
 
-    return distance <= 1000;
+    return distance <= 20;
   }
 
   double getDistanceToPost({

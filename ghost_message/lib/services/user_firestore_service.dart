@@ -149,14 +149,12 @@ class UserFirestoreService {
     await setupInitialLeaderboard(
       uid: uid,
       username: username,
-      photoPath: photoPath,
     );
   }
 
   Future<void> setupInitialLeaderboard({
     required String uid,
     required String username,
-    required String photoPath,
   }) async {
     await _instance
         .collection('leaderboards')
@@ -166,7 +164,6 @@ class UserFirestoreService {
         .set({
       'uid': uid,
       'username': username,
-      'photo_path': photoPath,
       'count': 0,
       'updated_at': FieldValue.serverTimestamp(),
     });
@@ -179,65 +176,9 @@ class UserFirestoreService {
         .set({
       'uid': uid,
       'username': username,
-      'photo_path': photoPath,
       'count': 0,
       'updated_at': FieldValue.serverTimestamp( ),
     });
-  }
-
-  Future<void> rebuildLeaderboardFromPosts() async {
-    final usersSnapshot = await _instance.collection('users').get();
-    final postsSnapshot = await _instance.collection('posts').get();
-
-    final Map<String, int> postCounts = {};
-    final Map<String, int> likeCounts = {};
-
-    for (final postDoc in postsSnapshot.docs) {
-      final data = postDoc.data();
-      final String authorId = data['author_id'] ?? '';
-      final int likeCount = (data['like_count'] ?? 0) as int;
-
-      if (authorId.isEmpty) continue;
-
-      postCounts[authorId] = (postCounts[authorId] ?? 0) + 1;
-      likeCounts[authorId] = (likeCounts[authorId] ?? 0) + likeCount;
-    }
-
-    for (final userDoc in usersSnapshot.docs) {
-      final data = userDoc.data();
-      final String uid = data['uid'] ?? userDoc.id;
-      final String username = data['username'] ?? '';
-      final String photoPath = data['photo_path'] ?? '';
-
-      final int posts = postCounts[uid] ?? 0;
-      final int likes = likeCounts[uid] ?? 0;
-
-      await _instance
-          .collection('leaderboards')
-          .doc('posts')
-          .collection('entries')
-          .doc(uid)
-          .set({
-        'uid': uid,
-        'username': username,
-        'photo_path': photoPath,
-        'count': posts,
-        'updated_at': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
-
-      await _instance
-          .collection('leaderboards')
-          .doc('likes')
-          .collection('entries')
-          .doc(uid)
-          .set({
-        'uid': uid,
-        'username': username,
-        'photo_path': photoPath,
-        'count': likes,
-        'updated_at': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
-    }
   }
 
   Future<void> updateUserPhotoEverywhere({
