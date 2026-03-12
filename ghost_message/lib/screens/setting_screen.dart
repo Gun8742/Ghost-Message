@@ -19,8 +19,6 @@ class SettingScreen extends StatefulWidget {
 }
 
 class _SettingScreenState extends State<SettingScreen> {
-  bool _notification = true;
-  bool _nearbyChatNotification = true;
 
   final UserFirestoreService _userFirestoreService = UserFirestoreService();
 

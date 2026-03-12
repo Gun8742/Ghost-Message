@@ -351,7 +351,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     style: TextStyle(
                       fontWeight: FontWeight.bold, 
                       fontSize: 16,
-                      // 🟢 ใช้ currentTextColor
                       color: themeProvider.currentTextColor, 
                     ),
                   ),

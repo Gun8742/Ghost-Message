@@ -868,7 +868,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       Text("$idLabel: ", style: const TextStyle(fontSize: 10, color: Colors.grey)),
                       Expanded(
                         child: SelectableText(
-                          report.targetId,
+                          report.reportedByUid,
                           style: const TextStyle(fontSize: 10, color: Colors.grey),
                         ),
                       ),

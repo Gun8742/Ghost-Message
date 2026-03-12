@@ -39,7 +39,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Set<Circle> _circleSet = {};
   final Set<String> _seenNearbyPostIds = {};
   bool _hasLoadedInitialNearbyPosts = false;
-  DateTime? _homeOpenedAt;
   Position? _lastNotificationBasePosition;
 
   static const CameraPosition _defaultCameraPosition = CameraPosition(
