@@ -49,7 +49,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _homeOpenedAt = DateTime.now();
     _initMapSystem();
   }
 
@@ -562,7 +561,6 @@ class _HomeScreenState extends State<HomeScreen> {
     if (movedDistance > 50) {
       _seenNearbyPostIds.clear();
       _hasLoadedInitialNearbyPosts = false;
-      _homeOpenedAt = DateTime.now();
       _lastNotificationBasePosition = newPosition;
     }
   }
