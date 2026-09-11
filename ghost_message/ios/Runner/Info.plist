@@ -45,5 +45,15 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Need camera access for AR mode and ถ่ายรูปโปรไฟล์</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>แอปพลิเคชันต้องการเข้าถึงอัลบั้มเพื่อเลือกรูปโปรไฟล์</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>เราต้องการตำแหน่งของคุณเพื่อแสดงข้อความผีรอบตัวคุณ</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>เราต้องการตำแหน่งของคุณเพื่อแสดงข้อความผีรอบตัวคุณ</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>เราต้องการตำแหน่งของคุณเพื่อแสดงข้อความผีรอบตัวคุณ</string>
 </dict>
 </plist>

@@ -1,0 +1,44 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "ghost-message-acfb2",
+          "appId": "1:20602388138:android:cb425c239adb80c4ce9ad3",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "ios": {
+        "default": {
+          "projectId": "ghost-message-acfb2",
+          "appId": "1:20602388138:ios:2a0fda53013ff61fce9ad3",
+          "uploadDebugSymbols": false,
+          "fileOutput": "ios/Runner/GoogleService-Info.plist"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "ghost-message-acfb2",
+          "configurations": {
+            "android": "1:20602388138:android:cb425c239adb80c4ce9ad3",
+            "ios": "1:20602388138:ios:2a0fda53013ff61fce9ad3"
+          }
+        }
+      }
+    }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "disallowLegacyRuntimeConfig": true,
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ]
+    }
+  ]
+}
